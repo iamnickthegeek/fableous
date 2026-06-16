@@ -1,71 +1,92 @@
 # Contributing to Fable Orchestrator
 
-Thank you for your interest in contributing! This project is designed to be accessible to non-coders and developers alike.
+## What You Need
 
-## Ways to Contribute
+- Hermes Agent installed
+- The skill loaded: `skill_view(name='fableous')`
+- Familiarity with the skill structure (SKILL.md, references/, templates/)
 
-### For Non-Coders
+## How to Contribute
 
-- **Test it**: Run tasks and report what works and what doesn't
-- **Share examples**: Add your task descriptions to `examples/`
-- **Improve documentation**: If something in INSTALL.md or README.md is confusing, suggest changes
-- **Report bugs**: Open an issue with your task description and the error message
+### 1. Report an Issue
 
-### For Developers
+Open a GitHub issue:
+- What happened
+- What you expected
+- The exact task that triggered it
+- Your Hermes version and provider setup
 
-- **Add features**: See the roadmap below
-- **Write tests**: Add tests to `tests/`
-- **Fix bugs**: Check open issues and submit PRs
-- **Improve code**: Refactoring, performance improvements, better error handling
+### 2. Suggest a Change
 
-## Development Setup
+- Open an issue first. Describe the change and why it improves the skill.
+- If approved, submit a PR.
 
-```bash
-# Clone the repo
-git clone https://github.com/iamnickthegeek/fable-orchestrator.git
-cd fable-orchestrator
+### 3. Update the Skill
 
-# Install in development mode
-pip install -e .
+The skill is the SKILL.md file. Changes to the skill must follow the Hermes skill format:
 
-# Run tests
-pytest tests/
-```
+- YAML frontmatter with name, description, version, author, license, metadata
+- Markdown body with sections matching the skill's structure
+- Imperative language for procedures: "You MUST...", "Do NOT..."
+- Every new feature must include a verification checklist
 
-## Code Style
+### 4. Update Reference Documents
 
-- Python 3.10+ with type hints
-- Docstrings for all public functions
-- Keep functions focused and small
-- Add tests for new features
+Reference documents in `references/` are supporting docs. They can be updated independently of the skill.
 
-## Roadmap
+- Keep them factual and specific
+- Avoid generic advice
+- Include examples
+- Cross-reference the SKILL.md where relevant
 
-### v5.1 (Next)
-- [ ] Vision integration: analyze images in the automated loop
-- [ ] Dynamic re-planning: adjust the DAG mid-flight when obstacles are encountered
-- [ ] Better verification: domain-specific checks (e.g., run `pytest` for software, check citations for research)
+### 5. Update Prompt Templates
 
-### v5.2
-- [ ] Distributed agent pool: support for hundreds of agents via Redis/RabbitMQ
-- [ ] Web dashboard: visualize running tasks, stage status, and outputs
-- [ ] Plugin system: custom stages and verification checks
+Templates in `templates/` are reusable prompts. When updating:
 
-### v6.0
-- [ ] Integration with Hermes native tools: use `delegate_task` when available, fallback to subprocess
-- [ ] Auto-discovery: automatically detect the task type and choose the right stage sequence
-- [ ] Self-improvement: learn from past tasks to improve planning and model selection
+- Keep them generic enough to work with any task
+- Use {{variable}} placeholders for task-specific data
+- Include guardrails and model tagging instructions
+- Test the template with a real task before submitting
 
-## Submitting Changes
+### 6. Add Examples
 
-1. Fork the repo
-2. Create a branch: `git checkout -b my-feature`
-3. Make your changes
-4. Run tests: `pytest tests/`
-5. Commit: `git commit -m "Add my feature"`
-6. Push: `git push origin my-feature`
-7. Open a Pull Request
+Examples in `examples/` are concrete execution traces. When adding:
 
-## Questions?
+- Show the full 6-stage execution
+- Include the exact todo list
+- Show the verification checks
+- Include expected outputs
+- Estimate time
 
-Open an issue or ask in the Hermes Agent community.
+### 7. Update Helper Scripts
+
+Scripts in `scripts/` are small utilities, not an engine. If you change them:
+
+- Keep them self-contained and runnable with `python3 scripts/<name>.py`
+- Do not reintroduce a Python engine, daemon, or state database
+- Run `python3 scripts/verify_models.py` to confirm it still works
+- Run `python3 scripts/auto_detect_providers.py` to confirm output is valid YAML
+
+### 8. Test Before Submitting
+
+Run the skill against a real task before submitting:
+
+1. Load the skill: `/skill fableous`
+2. Give a task: "Write a blog post about X"
+3. Verify all 6 stages complete
+4. Verify the FINAL.md is correct
+5. Check the WORK_LOG.md for completeness
+6. Log the result in `examples/test_results.md`
+7. Run `python3 scripts/verify_models.py` to confirm provider setup
+
+## Code of Conduct
+
+- Be direct. No filler.
+- Focus on what works.
+- Prefer simple solutions.
+- Document the reasoning.
+- Ship working tools.
+
+## License
+
+MIT. See [LICENSE](LICENSE).

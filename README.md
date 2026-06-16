@@ -1,137 +1,229 @@
-# Fable Orchestrator
+# Fable Orchestrator v6.1
 
-**Give complex tasks to AI. Let it work while you sleep. Check the results when you wake up.**
+**Strict multi-stage execution for Hermes Agent. No engine. Just the skill and a few helper scripts.**
 
-An open-source, automated task execution system for [Hermes Agent](https://hermes-agent.nousresearch.com). Breaks big tasks into smaller stages, runs them in parallel, checks its own work, and produces a final result.
+A Hermes-native orchestrator that decomposes complex tasks into 6 stages, enforces cross-family verification, verifies model usage, and dynamically replans when obstacles appear. Uses only native Hermes tools — no Python engine, no SQLite, no daemon.
 
 Built by Nick Smith (Point Clear Advisory). MIT licensed.
 
 ---
 
-## What This Does (In Plain English)
+## What This Does
 
-You have a big task — like writing a 20-page report or building a web app. Instead of sitting at your computer and guiding the AI through every step, you:
+You have a complex task — a research report, a software project, a competitive analysis. Instead of a one-shot attempt that might miss things, you:
 
-1. **Describe the task** in one sentence
-2. **The engine asks clarifying questions** (e.g., "What tone?", "How long?")
-3. **It breaks the task into stages** — Research, Plan, Write, Check, Review
-4. **It runs each stage** using different AI models optimized for that type of work
-5. **It checks its own work** after each stage
-6. **It produces a final result** saved to a file on your computer
+1. **Load the skill** and describe the task
+2. **The skill decomposes it** into 6 stages with explicit dependencies
+3. **Each stage is delegated** to a model optimized for that cognitive task
+4. **Verification checks** run after every stage — checks that can actually fail
+5. **Model verification** confirms the right model was used
+6. **Critique runs on a different model family** — the anti-hallucination measure
+7. **Dynamic replanning** rebuilds the plan when obstacles invalidate it
+8. **Consolidation** produces a single canonical deliverable
 
-You can set it up to run automatically every 15 minutes, so you start a task before bed and wake up to a finished report.
+For multi-session tasks, a cron job continues execution across session resets.
 
 ---
 
 ## Who This Is For
 
-- **Solopreneurs** who want AI to handle research and writing while they sleep
-- **Content creators** who need consistent, high-quality output without micromanaging
+- **Solopreneurs** who want AI to handle complex work without micromanaging
+- **Content creators** who need consistent, high-quality, verified output
 - **Non-coders** who want the power of multi-agent AI without writing code
 - **Anyone** who has ever thought "I wish the AI could just work on this for a few hours and tell me when it's done"
 
----
+## When to Use It
 
-## Quick Start (5 Minutes)
+Trigger Fable when:
 
-### 1. Install
+1. You explicitly ask for thorough/systematic/Fable mode ("do this thoroughly", "run this through fable").
+2. The task spans multiple files, sources, sessions, or domains.
+3. A one-shot attempt would plausibly miss something important.
 
-```bash
-# Clone the repo (or copy the files to ~/.hermes/skills/fable-orchestrator)
-git clone https://github.com/iamnickthegeek/fable-orchestrator.git ~/.hermes/skills/fable-orchestrator
+Skip Fable when the task has one obvious approach and fits in a single pass.
 
-# Make the script executable
-chmod +x ~/.hermes/skills/fable-orchestrator/scripts/fable_daemon.py
+## Quick Start
 
-# Run the automated setup wizard
-python3 ~/.hermes/skills/fable-orchestrator/quickstart.py
-```
+### 1. Install the Skill
 
-The wizard will check everything, set up auto-execution, and optionally run a test task.
-
-### 2. Start Your First Task
+See [`INSTALL.md`](INSTALL.md) for a step-by-step guide. The quickest way:
 
 ```bash
-python3 ~/.hermes/skills/fable-orchestrator/scripts/fable_daemon.py \
-    --start \
-    --task "Write a competitive analysis of AI ghostwriting tools" \
-    --output-dir ~/fable-outputs
+./setup.sh
 ```
 
-### 3. Continue the Task
+Or install manually:
 
 ```bash
-# Run the next tick (execute the next batch of stages)
-python3 ~/.hermes/skills/fable-orchestrator/scripts/fable_daemon.py \
-    --tick \
-    --output-dir ~/fable-outputs
+hermes skills install https://raw.githubusercontent.com/iamnickthegeek/fableous/main/SKILL.md
 ```
 
-You might need to run this 3-5 times for a simple task. Each time, it picks up where it left off.
+No `pip install`. No daemon setup. No SQLite configuration. Just the skill.
 
-### 4. Check the Results
+### 2. Check Your Setup
 
 ```bash
-# See all tasks and their status
-python3 ~/.hermes/skills/fable-orchestrator/scripts/fable_daemon.py \
-    --status \
-    --state-db ~/.hermes/fable_state.db
-
-# Look at the output folder
-ls ~/fable-outputs/
+python3 scripts/verify_models.py
 ```
 
----
+This confirms your API keys are configured.
 
-## Full Documentation
+### 3. Load the Skill
 
-| Document | What it covers |
-|----------|-------------|
-| **[INSTALL.md](INSTALL.md)** | Step-by-step setup for non-coders. Troubleshooting. Cheat sheet. |
-| **[examples/simple_task.md](examples/simple_task.md)** | How to run a simple task (15-30 minutes) |
-| **[examples/software_project.md](examples/software_project.md)** | How to run a software project (1-2 hours) |
-| **[examples/research_report.md](examples/research_report.md)** | How to run a large research report (4+ hours, with cron) |
+```
+/skill fableous
+```
+
+Or start Hermes with the skill preloaded:
+
+```bash
+hermes -s fableous
+```
+
+### 4. Give a Task
+
+```
+"Run this through Fable: write a competitive analysis of AI ghostwriting tools for digital marketers, with 3 real competitors, verified pricing, and cited sources."
+```
+
+The skill will:
+1. Create a 6-stage todo list
+2. Delegate each stage to the right model
+3. Run verification checks
+4. Verify the models used
+5. Critique on a different model family
+6. Consolidate into FINAL.md
+7. Maintain a WORK_LOG.md for multi-session continuity
+
+### 5. For Multi-Session Tasks
+
+Set up a cron job to continue execution across session resets:
+
+```
+cronjob(
+  action="create",
+  schedule="*/15 * * * *",
+  prompt="Load the fableous skill. Read the WORK_LOG.md in the project directory. Continue execution from the next pending stage. Follow the v6 stage execution procedure exactly.",
+  name="fableous-[project]"
+)
+```
 
 ---
 
 ## How It Works
 
-### The Daemon Pattern
+### The 6-Stage Pipeline
 
-Hermes Agent runs in a single session. Fable Orchestrator works around this by using a **cron job** — a small program that runs every 15 minutes:
+Every task goes through these stages:
 
-1. **You start a task** with `--start`. The engine plans the stages and saves them to a database.
-2. **The cron job runs** `--tick` every 15 minutes. It checks for pending stages, executes one batch, and saves progress.
-3. **You check the results** later with `--status` or by looking at the output files.
-4. **If something interrupts** (computer restart, session reset), the task resumes automatically from the last saved point.
+1. **Research** — Gather sources, extract claims, verify URLs
+2. **Plan** — Architecture, audience segmentation, methodology
+3. **Implement** — Write the deliverable, save to disk
+4. **Verify** — Run failable checks, trace sources, check consistency
+5. **Critique** — Independent review on a different model family
+6. **Consolidate** — Read all stages, apply fixes, produce FINAL.md
 
-This is the closest thing to "AI that works while you sleep" without modifying the Hermes core.
+### Dependencies
 
-### The Stages
+- Stage 1 (Research) and Stage 2 (Plan) have no dependencies. They can run in parallel.
+- Stage 3 (Implement) depends on both. It runs after both complete.
+- Stage 4 (Verify) depends on Stage 3.
+- Stage 5 (Critique) depends on Stage 3 and Stage 4.
+- Stage 6 (Consolidate) depends on all prior stages.
 
-Every task goes through these stages (some may be skipped for simple tasks):
+### Model Routing
 
-1. **Research** — Gathers information from the web
-2. **Plan** — Creates a detailed execution plan
-3. **Implement** — Does the actual work (writing, coding, etc.)
-4. **Verify** — Checks that the output is correct and complete
-5. **Critique** — A different AI model reviews the work for blind spots
-6. **Consolidate** — Produces the final, polished deliverable
+| Stage | Primary | Secondary | Tertiary | Rationale |
+|-------|---------|-----------|----------|-----------|
+| Research | `deepseek-v4-flash` (Opencode Go) | `gemini-2.5-flash-lite` (Google) | `nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free` (OpenRouter) | Fast, broad, cheap |
+| Plan | `glm-5.1` (Opencode Go) | `gemini-2.5-pro` (Google) | `deepseek-v4-pro` (Opencode Go) | Structured reasoning |
+| Implement | `kimi-k2.7-code` (Opencode Go) | `kimi-k2.6` (Opencode Go) | `gemini-2.5-pro` (Google) | Code-specialized |
+| Verify | `deepseek-v4-pro` (Opencode Go) | `gemini-2.5-pro` (Google) | `kimi-k2.6` (Opencode Go) | Different family from coder |
+| Critique | `glm-5.1` (Opencode Go) | `gemini-2.5-pro` (Google) | `kimi-k2.6` (Opencode Go) | Independent evaluation |
+| Consolidate | `deepseek-v4-pro` (Opencode Go) | `glm-5.1` (Opencode Go) | `gemini-2.5-pro` (Google) | Reads all stages, produces canonical output |
 
-### Why Different Models?
+Auto-detects available providers from your Hermes config. Or provide a `fable-config.yaml` in your project directory for explicit control.
 
-Each stage uses a different AI model optimized for that type of thinking:
+### Cross-Family Verification
 
-| Stage | Primary Model | Why |
-|-------|-------------|-----|
-| Research | DeepSeek V4 Flash | Fast, good at web search |
-| Planning | GLM 5.1 | Structured, logical thinking |
-| Implementation | Kimi 2.7 Code | Best at coding and writing |
-| Verification | DeepSeek V4 Pro | Thorough, detail-oriented |
-| Critique | GLM 5.1 | Different family = catches different errors |
-| Consolidation | DeepSeek V4 Pro | Synthesizes everything into a polished result |
+The critical anti-hallucination measure: **Critique and Consolidate must run on a different model family than Implement.**
 
-If a model fails, the engine automatically tries a fallback model.
+If Kimi wrote the code, GLM or Gemini must critique it. This is non-negotiable.
+
+### Model Verification
+
+`delegate_task` has a `model` parameter, but it is suggestive — the subagent can ignore it. The skill verifies the model actually used by:
+
+1. **Model tag** — Include `[MODEL: name, PROVIDER: provider]` in the prompt. Check the first line of output.
+2. **Session search** — Find the subagent's session and inspect the model used.
+3. **Terminal spawn** — Retry with hardcoded flags if verification fails.
+
+For a ready-made hard-routing wrapper, use `scripts/run_stage.py`.
+
+### Dynamic Replanning
+
+When a stage produces unexpected results, the skill rebuilds the plan:
+
+- Insufficient research? Add an "Extended Research" stage.
+- Verification failed? Add a "Fix" stage.
+- New requirements? Rebuild the plan, preserve completed work.
+
+### Work Log
+
+The `WORK_LOG.md` is the handoff protocol between sessions. At the start of any continuation, the skill reads the work log before doing anything else.
+
+---
+
+## Verification
+
+Fable uses four layers of verification. Every stage is only complete once all relevant checks pass.
+
+### 1. Domain-specific failable checks
+
+Each stage must have a pass condition defined before it is delegated. "It looks right" is not a check. The actual checks depend on the work type:
+
+| Domain | Example checks |
+|--------|----------------|
+| **Software** | Tests pass (`pytest -q`), build succeeds, type check passes, lint clean |
+| **Research** | At least 3 cited sources, URLs return 200, every claim traces to a source, no internal contradictions |
+| **Data** | No nulls/duplicates, outliers within threshold, hypothesis test returns expected result |
+| **Writing** | Matches brief (word count, sections, tone), claims trace to research, plagiarism check, audience/tone check |
+| **Generic** | File exists and has content, required section or string present, diff against expected output |
+
+If any check fails, the stage fails and the pipeline stops until it is fixed or re-run.
+
+### 2. Model verification
+
+`delegate_task(model=...)` is only a suggestion, so Fable verifies the actual model used for every stage:
+
+1. **Model tag** — the subagent writes `[MODEL: name, PROVIDER: provider]` as the first line of output.
+2. **Session search** — if the tag is missing, search the subagent's session metadata.
+3. **Terminal spawn** — if still uncertain, retry with `hermes chat -m MODEL --provider PROVIDER`.
+
+Required for Implement, Verify, Critique, and Consolidate. Best-effort for Research and Plan.
+
+### 3. Cross-family verification
+
+Verify, Critique, and Consolidate must run on a different model family than Implement. If Kimi wrote the code, DeepSeek, GLM, or Gemini must verify and critique it. Same-family retry counts as a failure.
+
+### 4. Replanning triggers
+
+After every stage, the skill checks whether the output invalidates the plan. If so, it rebuilds the plan before continuing:
+
+| Trigger | Condition | Action |
+|---------|-----------|--------|
+| T1 | Research found fewer than 3 sources | Add "Extended Research" stage |
+| T2 | Plan is simpler than expected | Skip unnecessary stages |
+| T3 | Plan is more complex than expected | Add new stages (e.g., "Security Audit") |
+| T4 | Implement output differs from plan | Rebuild plan, preserve research |
+| T5 | Verify fails | Re-run Implement or add "Fix" stage |
+| T6 | Critique finds more than 3 critical weaknesses | Add "Fix" stage before Consolidate |
+| T7 | New requirements mid-flight | Rebuild plan, preserve completed stages |
+| T8 | Model verification fails 3 times | Use cheapest available model, flag to user |
+
+All results are logged in `WORK_LOG.md`.
+
+For the full per-domain checklists, see `references/verification-templates.md`. For the full model verification rules, see `references/model-verification.md`.
 
 ---
 
@@ -139,130 +231,143 @@ If a model fails, the engine automatically tries a fallback model.
 
 ### Example 1: Simple Blog Post
 
-```bash
-python3 ~/.hermes/skills/fable-orchestrator/scripts/fable_daemon.py \
-    --start \
-    --task "Write a 500-word blog post about AI marketing for solopreneurs" \
-    --output-dir ~/fable-outputs
+```
+"Run this through Fable: write a 500-word blog post about AI marketing for solopreneurs."
 ```
 
-**Result:** `~/fable-outputs/task_YYYYMMDD_HHMMSS/FINAL.md`
+**Result:** `FINAL.md` with Version & Caveats header.
 
-**Time:** 15-30 minutes
+**Time:** 30-45 minutes.
 
 ### Example 2: Software Project
 
-```bash
-python3 ~/.hermes/skills/fable-orchestrator/scripts/fable_daemon.py \
-    --start \
-    --task "Build a Python script that scrapes a website and saves to CSV" \
-    --output-dir ~/fable-outputs
+```
+"Run this through Fable: build a FastAPI authentication service with JWT tokens, rate limiting, and user registration."
 ```
 
 **Result:**
-- `stage1_research.md` — Research on scraping libraries
-- `stage2_plan.md` — Implementation plan
-- `stage3_implement.md` — The actual Python script
-- `stage4_verify.md` — Test results
-- `stage5_critique.md` — Code review
-- `FINAL.md` — Final script with fixes applied
+- `app/` — The actual code
+- `tests/` — pytest suite
+- `FINAL.md` — README with setup instructions
 
-**Time:** 30-60 minutes
+**Time:** 1-2 hours.
 
 ### Example 3: Large Research Report (With Cron)
 
-```bash
-# Start the task
-python3 ~/.hermes/skills/fable-orchestrator/scripts/fable_daemon.py \
-    --start \
-    --task "Write a 20-page research report on AI marketing trends for 2026" \
-    --output-dir ~/fable-outputs
-
-# The cron job handles the rest automatically
+```
+"Run this through Fable: write a 20-page research report on AI marketing trends for 2026."
 ```
 
-**Result:** `~/fable-outputs/task_YYYYMMDD_HHMMSS/FINAL.md` (20 pages)
+**Result:** `FINAL.md` (20 pages) with all sources verified.
 
-**Time:** 2-4 hours (runs while you sleep)
+**Time:** 2-4 hours (runs via cron job).
+
+See `examples/` for full execution details.
 
 ---
 
-## Setting Up Auto-Run (Cron)
+## Configuration
 
-To make tasks run automatically without you manually typing `--tick`:
+### Auto-Detection
+
+The skill reads your Hermes config (`~/.hermes/config.yaml` and `~/.hermes/.env`) to determine available providers and models.
+
+### Helper Scripts
+
+Run these from the skill directory:
 
 ```bash
-# Add this to your crontab (run 'crontab -e' to edit)
-*/15 * * * * python3 /home/case/.hermes/skills/fable-orchestrator/scripts/fable_daemon.py --tick --output-dir /home/case/fable-outputs --state-db /home/case/.hermes/fable_state.db
+# Check providers and API keys
+python3 scripts/verify_models.py
+
+# Generate a custom fable-config.yaml
+python3 scripts/auto_detect_providers.py --save
+
+# Run a single stage with hard routing and fallback
+python3 scripts/run_stage.py --stage research --prompt "Your task" --output stage1.md
 ```
 
-Or run the quickstart wizard which does this for you:
+### YAML Override
 
-```bash
-python3 ~/.hermes/skills/fable-orchestrator/quickstart.py
+Create a `fable-config.yaml` in your project directory:
+
+```yaml
+routing:
+  research:
+    primary:
+      model: deepseek-v4-flash
+      provider: opencode-go
+    secondary:
+      model: gemini-2.5-flash-lite
+      provider: google
+    tertiary:
+      model: nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free
+      provider: openrouter
+  # ... etc for all stages
 ```
 
----
-
-## Common Commands
-
-| What you want | Command |
-|---------------|---------|
-| Start a new task | `python3 ~/.hermes/skills/fable-orchestrator/scripts/fable_daemon.py --start --task "Your task" --output-dir ~/fable-outputs` |
-| Run the next tick | `python3 ~/.hermes/skills/fable-orchestrator/scripts/fable_daemon.py --tick --output-dir ~/fable-outputs` |
-| Check all tasks | `python3 ~/.hermes/skills/fable-orchestrator/scripts/fable_daemon.py --status --state-db ~/.hermes/fable_state.db` |
-| Resume a task | `python3 ~/.hermes/skills/fable-orchestrator/scripts/fable_daemon.py --resume TASK_ID --output-dir ~/fable-outputs --state-db ~/.hermes/fable_state.db` |
-| Follow a task's log | `python3 ~/.hermes/skills/fable-orchestrator/scripts/fable_daemon.py --tail TASK_ID --state-db ~/.hermes/fable_state.db` |
+The skill uses this instead of auto-detection.
 
 ---
 
 ## Requirements
 
 - Hermes Agent (any recent version)
-- Python 3.10 or higher (your Hermes machine already has this)
-- API keys for Opencode Go, Google, and optionally OpenRouter
-- Linux (your Hermes machine runs this)
+- API keys for at least one provider (Opencode Go, Google, or OpenRouter)
+- The skill installed via `hermes skills install`
 
 ---
 
 ## Architecture
 
 ```
-fable-orchestrator/
-├── fable_engine/          # Core engine (you don't need to touch these)
-│   ├── core.py            # Main orchestrator
-│   ├── state.py           # SQLite database (saves your task progress)
-│   ├── planner.py         # Decides what to do and which AI to use
-│   ├── agent_pool.py      # Runs multiple AI agents at once
-│   ├── verification.py    # Checks the AI's work
-│   ├── context.py         # Keeps things from getting too long
-│   └── questioner.py      # Asks you clarifying questions
+fableous/
+├── SKILL.md                      # Main skill definition (strict procedure)
+├── INSTALL.md                    # Step-by-step installation for non-technical users
+├── README.md                     # This file
+├── CHANGELOG.md                  # Version history
+├── setup.sh                      # One-click install + pre-flight check
+├── LICENSE                       # MIT license
+├── references/
+│   ├── model-routing-table.md    # Quick lookup
+│   ├── guardrails.md             # Prompt guardrails per stage
+│   ├── verification-templates.md # Domain-specific checks
+│   ├── work-log-template.md      # Handoff protocol
+│   ├── replanning-triggers.md    # When to rebuild the plan
+│   ├── model-verification.md     # How to verify models
+│   └── test-notes.md             # Known issues and test matrix
+├── templates/
+│   ├── stage-prompts/            # Prompt templates for each stage
+│   │   ├── research.md
+│   │   ├── plan.md
+│   │   ├── implement.md
+│   │   ├── verify.md
+│   │   ├── critique.md
+│   │   └── consolidate.md
+│   ├── consolidation-prompt.md   # Master synthesis prompt
+│   └── replanning-prompt.md      # Dynamic replanning prompt
 ├── scripts/
-│   ├── fable_daemon.py    # Main program you run (this is the one you use)
-│   └── verify_models.py   # Checks your API keys are working
-├── tests/                 # Test suite (for developers)
-├── examples/              # Example tasks (see these for ideas)
-├── quickstart.py          # Automated setup wizard (run this first)
-├── README.md              # This file
-├── INSTALL.md             # Detailed setup guide for non-coders
-├── LICENSE                # MIT license
-└── SKILL.md               # Hermes skill definition
+│   ├── verify_models.py          # Pre-flight model check
+│   ├── auto_detect_providers.py  # Auto-detect routing table
+│   ├── run_stage.py              # Hard-routed stage runner with fallback
+│   └── fable_routing.py          # Shared constants for the scripts
+├── examples/
+│   ├── simple_task.md            # Blog post example
+│   ├── software_project.md       # FastAPI example
+│   ├── research_report.md        # Competitive analysis example
+│   └── test_results.md           # Living test log
+└── archive/                      # Old v1-v5 engine code and planning docs
 ```
 
 ---
 
-## Status & Roadmap
+## Version History
 
-**Current (v1.0.0):**
-- Core engine, daemon, state persistence, dynamic planning, parallel execution, verification, proactive questioning
-- Tested end-to-end on real tasks
-
-**Planned (v5.1):**
-- Vision integration (analyze images automatically)
-- Dynamic re-planning mid-flight
-
-**Planned (v5.2):**
-- Distributed agent pool (hundreds of agents across multiple machines)
+- **v1-v3:** Procedural skill with sequential execution and subprocess model switching.
+- **v4:** Dynamic planner, parallel execution, checkpoint/resume.
+- **v5:** Modular Python engine, SQLite state, daemon pattern. Over-engineered — rebuilt 70% of native Hermes capabilities.
+- **v6.0:** Native-first. No engine. Uses Hermes tools exclusively. Adds model verification, dynamic replanning, strict procedural discipline, and small helper scripts for pre-flight checks and hard-routed stage execution.
+- **v6.1:** Formalised the trigger decision into a short checklist so the agent knows when to invoke Fable and when to skip it.
 
 ---
 
@@ -274,6 +379,7 @@ MIT. See [LICENSE](LICENSE).
 
 ## Questions?
 
-- Open an issue: [github.com/iamnickthegeek/fable-orchestrator/issues](https://github.com/iamnickthegeek/fable-orchestrator/issues)
-- Ask your Hermes agent to help you troubleshoot
-- Read [INSTALL.md](INSTALL.md) for step-by-step troubleshooting
+- Read [`INSTALL.md`](INSTALL.md) for setup help.
+- Open an issue: [github.com/iamnickthegeek/fableous/issues](https://github.com/iamnickthegeek/fableous/issues)
+- Ask your Hermes agent to help you troubleshoot.
+- Read the skill with `skill_view(name='fableous')`.
