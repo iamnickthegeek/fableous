@@ -1,8 +1,8 @@
-# Fable Orchestrator v7.1
+# Fableous v7.1
 
 **Strict multi-stage execution for Hermes Agent. No engine. Just the skill and a few helper scripts.**
 
-A Hermes-native orchestrator that decomposes complex tasks into 6 stages, enforces cross-family verification, verifies model usage, and dynamically replans when obstacles appear. Uses only native Hermes tools — no Python engine, no SQLite, no daemon.
+A Hermes-native orchestrator, inspired by Claude Fable 5, that decomposes complex tasks into 6 stages, enforces cross-family verification, verifies model usage, and dynamically replans when obstacles appear. Uses only native Hermes tools — no Python engine, no SQLite, no daemon.
 
 Built by Nick Smith. MIT licensed.
 
@@ -83,7 +83,7 @@ hermes -s fableous
 ### 4. Give a Task
 
 ```
-"Run this through Fable: write a competitive analysis of AI ghostwriting tools for digital marketers, with 3 real competitors, verified pricing, and cited sources."
+"Run this through Fableous: write a competitive analysis of AI ghostwriting tools for digital marketers, with 3 real competitors, verified pricing, and cited sources."
 ```
 
 The skill will:
@@ -103,7 +103,7 @@ Set up a cron job to continue execution across session resets:
 cronjob(
   action="create",
   schedule="*/15 * * * *",
-  prompt="Load the fableous skill. Read the WORK_LOG.md in the project directory. Continue execution from the next pending stage. Follow the v6 stage execution procedure exactly.",
+  prompt="Load the fableous skill. Read the WORK_LOG.md in the project directory. Continue execution from the next pending stage. Follow the stage execution procedure exactly.",
   name="fableous-[project]"
 )
 ```
@@ -131,7 +131,7 @@ Every task goes through these stages:
 - Stage 5 (Critique) depends on Stage 3 and Stage 4.
 - Stage 6 (Consolidate) depends on all prior stages.
 
-### Model Routing
+### Model Routing (Opencode Go Example)
 
 | Stage | Primary | Secondary | Tertiary | Rationale |
 |-------|---------|-----------|----------|-----------|
@@ -374,6 +374,16 @@ fableous/
 ## License
 
 MIT. See [LICENSE](LICENSE).
+
+---
+
+## Shoutouts
+
+Written by a combination of [GLM 5.1](https://github.com/zai-org), [Deepseek V4 Pro](https://github.com/deepseek-ai) and a little sprinkling of [Kimi 2.7 Coder](https://github.com/MoonshotAI) under my "guidance" ...
+
+Inspired by [Claude Fable 5](https://www.anthropic.com/), [@mrtooher's](https://github.com/mrtooher/fable-mode) Fable Model skill & [@papajos](https://github.com/papajo/Fable-Brain-Module) Fable Brain system.
+
+Also, huge shoutout to [Teknium](https://github.com/teknium1) & [NousResearch](https://nousresearch.com/) for creating Hermes.
 
 ---
 
