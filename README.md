@@ -152,13 +152,11 @@ If Kimi wrote the code, GLM or Gemini must critique it. This is non-negotiable.
 
 ### Model Verification
 
-`delegate_task` has a `model` parameter, but it is suggestive — the subagent can ignore it. The skill verifies the model actually used by:
+`delegate_task` has **no per-call model parameter** (confirmed by source-code audit). All model routing uses **config cycling** via `route_config.py`:
 
-1. **Model tag** — Include `[MODEL: name, PROVIDER: provider]` in the prompt. Check the first line of output.
-2. **Session search** — Find the subagent's session and inspect the model used.
-3. **Terminal spawn** — Retry with hardcoded flags if verification fails.
-
-For a ready-made hard-routing wrapper, use `scripts/run_stage.py`.
+1. **Config cycling** — Before each `delegate_task` call, run `route_config.py set --stage STAGE_NAME` to update `delegation.model` and `delegation.provider`. The child agent reads these from disk — guaranteed routing.
+2. **Model tag** — Each stage output includes `[MODEL: name, PROVIDER: provider]` as audit trail. Verified with `route_config.py verify`.
+3. **Terminal fallback** — If config cycling fails twice, use `run_stage.py` or `hermes chat -q` with explicit `-m` and `--provider` flags.
 
 ### Dynamic Replanning
 
@@ -194,13 +192,11 @@ If any check fails, the stage fails and the pipeline stops until it is fixed or 
 
 ### 2. Model verification
 
-`delegate_task(model=...)` is only a suggestion, so Fableous verifies the actual model used for every stage:
+`delegate_task` has **no per-call model parameter** (source-code audit confirmed). Fableous uses **config cycling** to guarantee routing:
 
-1. **Model tag** — the subagent writes `[MODEL: name, PROVIDER: provider]` as the first line of output.
-2. **Session search** — if the tag is missing, search the subagent's session metadata.
-3. **Terminal spawn** — if still uncertain, retry with `hermes chat -m MODEL --provider PROVIDER`.
-
-Required for Implement, Verify, Critique, and Consolidate. Best-effort for Research and Plan.
+1. **Config cycling** — `route_config.py set --stage STAGE_NAME` updates `delegation.model` and `delegation.provider` before every `delegate_task` call. The child agent reads these from disk — not a suggestion.
+2. **Model tag** — the subagent writes `[MODEL: name, PROVIDER: provider]` as the first line of output. Verified with `route_config.py verify`.
+3. **Terminal fallback** — if config cycling fails twice, retry with `run_stage.py` or `hermes chat -q -m MODEL --provider PROVIDER`.
 
 ### 3. Cross-family verification
 
@@ -277,6 +273,11 @@ The skill reads your Hermes config (`~/.hermes/config.yaml` and `~/.hermes/.env`
 Run these from the skill directory:
 
 ```bash
+# Config cycling — set model/provider before each stage
+python3 scripts/route_config.py set --stage research
+python3 scripts/route_config.py verify --output stage1.md --expected-model deepseek-v4-flash
+python3 scripts/route_config.py restore
+
 # Check providers and API keys
 python3 scripts/verify_models.py
 
@@ -285,6 +286,9 @@ python3 scripts/auto_detect_providers.py --save
 
 # Run a single stage with hard routing and fallback
 python3 scripts/run_stage.py --stage research --prompt "Your task" --output stage1.md
+
+# Detect routing capability (native vs config cycling)
+python3 scripts/detect_routing.py
 ```
 
 ### YAML Override
@@ -326,15 +330,29 @@ fableous/
 ├── INSTALL.md                    # Step-by-step installation for non-technical users
 ├── README.md                     # This file
 ├── CHANGELOG.md                  # Version history
+├── IMPLEMENTATION_PLAN_V7.md     # v7.0 config cycling design
+├── IMPLEMENTATION_PLAN_7-1.md    # v7.1 async subagent design
 ├── setup.sh                      # One-click install + pre-flight check
 ├── LICENSE                       # MIT license
 ├── references/
+│   ├── config-cycling.md         # Config cycling spec and edge cases
 │   ├── model-routing-table.md    # Quick lookup
+│   ├── model-verification.md     # Verification hierarchy (config cycling primary)
+│   ├── verification-templates.md # Domain-specific failable checks
 │   ├── guardrails.md             # Prompt guardrails per stage
-│   ├── verification-templates.md # Domain-specific checks
-│   ├── work-log-template.md      # Handoff protocol
-│   ├── replanning-triggers.md    # When to rebuild the plan
-│   ├── model-verification.md     # How to verify models
+│   ├── work-log-template.md      # Structured handoff protocol
+│   ├── replanning-triggers.md    # When and how to replan
+│   ├── v6-1-trigger-checklist.md # When to invoke Fableous, when to skip
+│   ├── delegate-task-model-routing-audit.md  # Source-code evidence
+│   ├── delegate-task-model-fallback.md       # Config cycling → terminal fallback
+│   ├── timeout-recovery-recipe.md            # Recovering from subagent timeouts
+│   ├── model-mismatch-recovery.md            # Model verification failure procedures
+│   ├── native-first-gap-fillers.md           # What Fable adds vs Hermes provides
+│   ├── helper-scripts.md         # When and how to use the scripts/ utilities
+│   ├── github-publication.md     # Publishing to GitHub
+│   ├── token-budget-mode.md      # Running Fable on cheapest models
+│   ├── pricing-verification-volatility.md    # AI pricing changes fast
+│   ├── ronin-partner-finder-case-study.md    # Worked example: building a skill
 │   └── test-notes.md             # Known issues and test matrix
 ├── templates/
 │   ├── stage-prompts/            # Prompt templates for each stage
@@ -347,10 +365,12 @@ fableous/
 │   ├── consolidation-prompt.md   # Master synthesis prompt
 │   └── replanning-prompt.md      # Dynamic replanning prompt
 ├── scripts/
-│   ├── verify_models.py          # Pre-flight model check
-│   ├── auto_detect_providers.py  # Auto-detect routing table
+│   ├── route_config.py           # Config cycling engine (set/restore/verify)
+│   ├── fable_routing.py          # Shared routing constants
+│   ├── detect_routing.py         # Feature detection (native vs config cycling)
 │   ├── run_stage.py              # Hard-routed stage runner with fallback
-│   └── fable_routing.py          # Shared constants for the scripts
+│   ├── verify_models.py          # Pre-flight model availability check
+│   └── auto_detect_providers.py  # Auto-detect routing table from config
 ├── examples/
 │   ├── simple_task.md            # Blog post example
 │   ├── software_project.md       # FastAPI example
@@ -368,6 +388,8 @@ fableous/
 - **v5:** Modular Python engine, SQLite state, daemon pattern. Over-engineered — rebuilt 70% of native Hermes capabilities.
 - **v6.0:** Native-first. No engine. Uses Hermes tools exclusively. Adds model verification, dynamic replanning, strict procedural discipline, and small helper scripts for pre-flight checks and hard-routed stage execution.
 - **v6.1:** Formalised the trigger decision into a short checklist so the agent knows when to invoke Fableous and when to skip it.
+- **v7.0:** Config cycling replaces terminal spawning as the primary routing method. New `route_config.py` engine with set/restore/verify/status commands before every `delegate_task` call. New `detect_routing.py` for future-proof native routing detection. Full rewrite of model verification hierarchy — source-code audit confirmed `delegate_task` has no per-call model parameter. Pitfalls 2 and 8 resolved.
+- **v7.1:** Async subagent support. Research and Plan now dispatch with `delegate_task(background=true)` for true parallel execution. Completion events arrive as new turns. Sync path unchanged for Implement+. Config cycling confirmed snapshot-safe for async dispatch. New pitfalls for async-specific traps (verification timing, capacity rejection).
 
 ---
 
