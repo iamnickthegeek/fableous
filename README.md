@@ -1,10 +1,10 @@
-# Fable Orchestrator v6.1
+# Fable Orchestrator v7.1
 
 **Strict multi-stage execution for Hermes Agent. No engine. Just the skill and a few helper scripts.**
 
 A Hermes-native orchestrator that decomposes complex tasks into 6 stages, enforces cross-family verification, verifies model usage, and dynamically replans when obstacles appear. Uses only native Hermes tools — no Python engine, no SQLite, no daemon.
 
-Built by Nick Smith (Point Clear Advisory). MIT licensed.
+Built by Nick Smith. MIT licensed.
 
 ---
 
@@ -34,9 +34,9 @@ For multi-session tasks, a cron job continues execution across session resets.
 
 ## When to Use It
 
-Trigger Fable when:
+Trigger Fableous when:
 
-1. You explicitly ask for thorough/systematic/Fable mode ("do this thoroughly", "run this through fable").
+1. You explicitly ask for thorough/systematic/Fable mode ("do this thoroughly", "run this through fableous").
 2. The task spans multiple files, sources, sessions, or domains.
 3. A one-shot attempt would plausibly miss something important.
 
@@ -176,7 +176,7 @@ The `WORK_LOG.md` is the handoff protocol between sessions. At the start of any 
 
 ## Verification
 
-Fable uses four layers of verification. Every stage is only complete once all relevant checks pass.
+Fableous uses four layers of verification. Every stage is only complete once all relevant checks pass.
 
 ### 1. Domain-specific failable checks
 
@@ -194,7 +194,7 @@ If any check fails, the stage fails and the pipeline stops until it is fixed or 
 
 ### 2. Model verification
 
-`delegate_task(model=...)` is only a suggestion, so Fable verifies the actual model used for every stage:
+`delegate_task(model=...)` is only a suggestion, so Fableous verifies the actual model used for every stage:
 
 1. **Model tag** — the subagent writes `[MODEL: name, PROVIDER: provider]` as the first line of output.
 2. **Session search** — if the tag is missing, search the subagent's session metadata.
@@ -232,7 +232,7 @@ For the full per-domain checklists, see `references/verification-templates.md`. 
 ### Example 1: Simple Blog Post
 
 ```
-"Run this through Fable: write a 500-word blog post about AI marketing for solopreneurs."
+"Run this through Fableous: write a 500-word blog post about AI marketing for solopreneurs."
 ```
 
 **Result:** `FINAL.md` with Version & Caveats header.
@@ -242,7 +242,7 @@ For the full per-domain checklists, see `references/verification-templates.md`. 
 ### Example 2: Software Project
 
 ```
-"Run this through Fable: build a FastAPI authentication service with JWT tokens, rate limiting, and user registration."
+"Run this through Fableous: build a FastAPI authentication service with JWT tokens, rate limiting, and user registration."
 ```
 
 **Result:**
@@ -255,7 +255,7 @@ For the full per-domain checklists, see `references/verification-templates.md`. 
 ### Example 3: Large Research Report (With Cron)
 
 ```
-"Run this through Fable: write a 20-page research report on AI marketing trends for 2026."
+"Run this through Fableous: write a 20-page research report on AI marketing trends for 2026."
 ```
 
 **Result:** `FINAL.md` (20 pages) with all sources verified.
@@ -367,7 +367,7 @@ fableous/
 - **v4:** Dynamic planner, parallel execution, checkpoint/resume.
 - **v5:** Modular Python engine, SQLite state, daemon pattern. Over-engineered — rebuilt 70% of native Hermes capabilities.
 - **v6.0:** Native-first. No engine. Uses Hermes tools exclusively. Adds model verification, dynamic replanning, strict procedural discipline, and small helper scripts for pre-flight checks and hard-routed stage execution.
-- **v6.1:** Formalised the trigger decision into a short checklist so the agent knows when to invoke Fable and when to skip it.
+- **v6.1:** Formalised the trigger decision into a short checklist so the agent knows when to invoke Fableous and when to skip it.
 
 ---
 
