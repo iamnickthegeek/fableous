@@ -924,6 +924,7 @@ reading caveat, and when to use scripts versus native tools.
 - `references/token-budget-mode.md` — single-model lightweight execution mode; when to use it and what it catches
 - `references/pricing-verification-volatility.md` — SaaS pricing decays fast; pattern for verification when claims may have changed since research
 - `references/ronin-partner-finder-case-study.md` — worked example of building a Hermes skill with Fable v6
+- `references/skill-rename-procedure.md` — clean rename procedure for the skill directory, SKILL.md name field, route_config.py path, and git remote
 - `references/test-notes.md` — known issues and test matrix
 - `templates/stage-prompts/` — prompt templates for each stage
 - `templates/consolidation-prompt.md` — the canonical synthesis prompt

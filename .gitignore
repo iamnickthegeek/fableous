@@ -28,3 +28,12 @@ Thumbs.db
 WORK_LOG.md
 fable-config.yaml
 *.log
+
+# Developer / internal (not for distribution)
+IMPLEMENTATION_PLAN*.md
+.commandcode/
+.cursor/
+.cursorrules
+*.bak
+*.tmp
+*~

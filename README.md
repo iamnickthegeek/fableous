@@ -330,8 +330,6 @@ fableous/
 ├── INSTALL.md                    # Step-by-step installation for non-technical users
 ├── README.md                     # This file
 ├── CHANGELOG.md                  # Version history
-├── IMPLEMENTATION_PLAN_V7.md     # v7.0 config cycling design
-├── IMPLEMENTATION_PLAN_7-1.md    # v7.1 async subagent design
 ├── setup.sh                      # One-click install + pre-flight check
 ├── LICENSE                       # MIT license
 ├── references/
