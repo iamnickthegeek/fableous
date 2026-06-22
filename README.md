@@ -1,4 +1,4 @@
-# Fableous v7.1
+# Fableous v0.8.2
 
 **Strict multi-stage execution for Hermes Agent. No engine. Just the skill and a few helper scripts.**
 
@@ -68,7 +68,25 @@ python3 scripts/verify_models.py
 
 This confirms your API keys are configured.
 
-### 3. Load the Skill
+### 3. Create a fable-config.yaml
+
+Create a `fable-config.yaml` in the skill directory (`~/.hermes/skills/fableous/fable-config.yaml`) with your preferred models:
+
+```yaml
+routing:
+  research:
+    primary:
+      model: deepseek-ai/deepseek-v4-flash
+      provider: nvidia
+    secondary:
+      model: gemini-2.5-flash-lite
+      provider: google
+  # ... etc for all stages
+```
+
+See `templates/fable-config-nvidia-nim.yaml` for a complete example. **No default routing table exists** — you MUST provide a fable-config.yaml.
+
+### 4. Load the Skill
 
 ```
 /skill fableous
@@ -80,7 +98,7 @@ Or start Hermes with the skill preloaded:
 hermes -s fableous
 ```
 
-### 4. Give a Task
+### 5. Give a Task
 
 ```
 "Run this through Fableous: write a competitive analysis of AI ghostwriting tools for digital marketers, with 3 real competitors, verified pricing, and cited sources."
@@ -95,7 +113,7 @@ The skill will:
 6. Consolidate into FINAL.md
 7. Maintain a WORK_LOG.md for multi-session continuity
 
-### 5. For Multi-Session Tasks
+### 6. For Multi-Session Tasks
 
 Set up a cron job to continue execution across session resets:
 
@@ -131,18 +149,20 @@ Every task goes through these stages:
 - Stage 5 (Critique) depends on Stage 3 and Stage 4.
 - Stage 6 (Consolidate) depends on all prior stages.
 
-### Model Routing (Opencode Go Example)
+### Model Routing
 
-| Stage | Primary | Secondary | Tertiary | Rationale |
-|-------|---------|-----------|----------|-----------|
-| Research | `deepseek-v4-flash` (Opencode Go) | `gemini-2.5-flash-lite` (Google) | `nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free` (OpenRouter) | Fast, broad, cheap |
-| Plan | `glm-5.1` (Opencode Go) | `gemini-2.5-pro` (Google) | `deepseek-v4-pro` (Opencode Go) | Structured reasoning |
-| Implement | `kimi-k2.7-code` (Opencode Go) | `kimi-k2.6` (Opencode Go) | `gemini-2.5-pro` (Google) | Code-specialized |
-| Verify | `deepseek-v4-pro` (Opencode Go) | `gemini-2.5-pro` (Google) | `kimi-k2.6` (Opencode Go) | Different family from coder |
-| Critique | `glm-5.1` (Opencode Go) | `gemini-2.5-pro` (Google) | `kimi-k2.6` (Opencode Go) | Independent evaluation |
-| Consolidate | `deepseek-v4-pro` (Opencode Go) | `glm-5.1` (Opencode Go) | `gemini-2.5-pro` (Google) | Reads all stages, produces canonical output |
+All routing is driven by `fable-config.yaml` in the skill directory. **There is no default routing table.** If no config file is found, the skill raises an error with instructions.
 
-Auto-detects available providers from your Hermes config. Or provide a `fable-config.yaml` in your project directory for explicit control.
+Example config (NVIDIA NIM):
+
+| Stage | Primary | Provider |
+|-------|---------|----------|
+| Research | deepseek-ai/deepseek-v4-flash | nvidia |
+| Plan | z-ai/glm-5.1 | nvidia |
+| Implement | nvidia/nemotron-3-ultra-550b-a55b | nvidia |
+| Verify | moonshotai/kimi-k2.6 | nvidia |
+| Critique | qwen/qwen3.5-397b-a17b | nvidia |
+| Consolidate | nvidia/nemotron-3-ultra-550b-a55b | nvidia |
 
 ### Cross-Family Verification
 
@@ -264,9 +284,15 @@ See `examples/` for full execution details.
 
 ## Configuration
 
-### Auto-Detection
+### fable-config.yaml (Required)
 
-The skill reads your Hermes config (`~/.hermes/config.yaml` and `~/.hermes/.env`) to determine available providers and models.
+Create a `fable-config.yaml` in the skill directory (`~/.hermes/skills/fableous/fable-config.yaml`). This is the **only** source of routing configuration. There is no default fallback.
+
+Config is auto-discovered from:
+1. Skill directory: `~/.hermes/skills/fableous/fable-config.yaml`
+2. Working directory: `./fable-config.yaml`
+
+If neither exists, the skill raises `RuntimeError` with setup instructions.
 
 ### Helper Scripts
 
@@ -291,33 +317,13 @@ python3 scripts/run_stage.py --stage research --prompt "Your task" --output stag
 python3 scripts/detect_routing.py
 ```
 
-### YAML Override
-
-Create a `fable-config.yaml` in your project directory:
-
-```yaml
-routing:
-  research:
-    primary:
-      model: deepseek-v4-flash
-      provider: opencode-go
-    secondary:
-      model: gemini-2.5-flash-lite
-      provider: google
-    tertiary:
-      model: nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free
-      provider: openrouter
-  # ... etc for all stages
-```
-
-The skill uses this instead of auto-detection.
-
 ---
 
 ## Requirements
 
 - Hermes Agent (any recent version)
-- API keys for at least one provider (Opencode Go, Google, or OpenRouter)
+- API keys for at least one provider (configured in `~/.hermes/.env`)
+- A `fable-config.yaml` in the skill directory
 - The skill installed via `hermes skills install`
 
 ---
@@ -350,6 +356,8 @@ fableous/
 │   ├── github-publication.md     # Publishing to GitHub
 │   ├── token-budget-mode.md      # Running Fable on cheapest models
 │   ├── pricing-verification-volatility.md    # AI pricing changes fast
+│   ├── nvidia-nim-unified-provider.md        # NVIDIA NIM as unified provider
+│   ├── cross-run-quality-analysis.md         # Cross-run quality case study
 │   ├── ronin-partner-finder-case-study.md    # Worked example: building a skill
 │   └── test-notes.md             # Known issues and test matrix
 ├── templates/
@@ -361,10 +369,11 @@ fableous/
 │   │   ├── critique.md
 │   │   └── consolidate.md
 │   ├── consolidation-prompt.md   # Master synthesis prompt
-│   └── replanning-prompt.md      # Dynamic replanning prompt
+│   ├── replanning-prompt.md      # Dynamic replanning prompt
+│   └── fable-config-nvidia-nim.yaml            # Ready-to-use NVIDIA NIM config
 ├── scripts/
 │   ├── route_config.py           # Config cycling engine (set/restore/verify)
-│   ├── fable_routing.py          # Shared routing constants
+│   ├── fable_routing.py          # Shared routing constants (no default table)
 │   ├── detect_routing.py         # Feature detection (native vs config cycling)
 │   ├── run_stage.py              # Hard-routed stage runner with fallback
 │   ├── verify_models.py          # Pre-flight model availability check
@@ -381,13 +390,21 @@ fableous/
 
 ## Version History
 
-- **v1-v3:** Procedural skill with sequential execution and subprocess model switching.
-- **v4:** Dynamic planner, parallel execution, checkpoint/resume.
-- **v5:** Modular Python engine, SQLite state, daemon pattern. Over-engineered — rebuilt 70% of native Hermes capabilities.
-- **v6.0:** Native-first. No engine. Uses Hermes tools exclusively. Adds model verification, dynamic replanning, strict procedural discipline, and small helper scripts for pre-flight checks and hard-routed stage execution.
-- **v6.1:** Formalised the trigger decision into a short checklist so the agent knows when to invoke Fableous and when to skip it.
-- **v7.0:** Config cycling replaces terminal spawning as the primary routing method. New `route_config.py` engine with set/restore/verify/status commands before every `delegate_task` call. New `detect_routing.py` for future-proof native routing detection. Full rewrite of model verification hierarchy — source-code audit confirmed `delegate_task` has no per-call model parameter. Pitfalls 2 and 8 resolved.
-- **v7.1:** Async subagent support. Research and Plan now dispatch with `delegate_task(background=true)` for true parallel execution. Completion events arrive as new turns. Sync path unchanged for Implement+. Config cycling confirmed snapshot-safe for async dispatch. New pitfalls for async-specific traps (verification timing, capacity rejection).
+- **v0.1-v0.3:** Procedural skill with sequential execution and subprocess model switching.
+- **v0.4:** Dynamic planner, parallel execution, checkpoint/resume.
+- **v0.5:** Modular Python engine, SQLite state, daemon pattern. Over-engineered — rebuilt 70% of native Hermes capabilities.
+- **v0.6.0:** Native-first. No engine. Uses Hermes tools exclusively. Adds model verification, dynamic replanning, strict procedural discipline, and small helper scripts for pre-flight checks and hard-routed stage execution.
+- **v0.6.1:** Formalised the trigger decision into a short checklist so the agent knows when to invoke Fableous and when to skip it.
+- **v0.7.0:** Config cycling replaces terminal spawning as the primary routing method. New `route_config.py` engine with set/restore/verify/status commands. New `detect_routing.py` for future-proof native routing detection. Full rewrite of model verification hierarchy — source-code audit confirmed `delegate_task` has no per-call model parameter. Pitfalls 2 and 8 resolved.
+- **v0.7.1:** Async subagent support. Research and Plan now dispatch with `delegate_task(background=true)` for true parallel execution. Completion events arrive as new turns. Sync path unchanged for Implement+. Config cycling confirmed snapshot-safe for async dispatch. New pitfalls for async-specific traps (verification timing, capacity rejection).
+- **v0.7.2:** Token-budget / lightweight mode. Single-model execution when user prioritises speed/cost over cross-family rigor.
+- **v0.7.3:** Orchestrator discipline. Pitfall 14 (orchestrator override), Pitfall 15 (inline async). Tightened token-budget mode triggers.
+- **v0.7.3.1:** Token-budget mode split into Primary-Only and Single-Model Flatlining sub-modes.
+- **v0.7.3.2:** T6 Fix stage template for critique finding >3 critical weaknesses.
+- **v0.7.3.3:** Single-model flatlining edge case (user bans all model routing).
+- **v0.8.0:** Quality intelligence. Deliverable type classification, cross-run reconciliation, methodology consistency, strategic insight preservation, fix calibration, quality tradeoffs documentation.
+- **v0.8.1:** Config file auto-discovery. `load_routing()` now finds fable-config.yaml from skill directory and working directory. Added Pitfall 16 (config silently ignored) and Pitfall 17 (search_files glob misses files).
+- **v0.8.2:** Removed `DEFAULT_ROUTING` table entirely — all routing MUST come from fable-config.yaml. Fixed `providers.nvidia.base_url` in Hermes config. Removed duplicate `nvidia:` key. Added Pitfall 18 (NVIDIA provider setup requires base_url + env var in gateway process). Changed version numbering to v0.x scheme.
 
 ---
 

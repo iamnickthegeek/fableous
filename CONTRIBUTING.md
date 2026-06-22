@@ -5,6 +5,7 @@
 - Hermes Agent installed
 - The skill loaded: `skill_view(name='fableous')`
 - Familiarity with the skill structure (SKILL.md, references/, templates/)
+- A `fable-config.yaml` in the skill directory (required — no default routing table exists)
 
 ## How to Contribute
 
@@ -71,13 +72,14 @@ Scripts in `scripts/` are small utilities, not an engine. If you change them:
 
 Run the skill against a real task before submitting:
 
-1. Load the skill: `/skill fableous`
-2. Give a task: "Write a blog post about X"
-3. Verify all 6 stages complete
-4. Verify the FINAL.md is correct
-5. Check the WORK_LOG.md for completeness
-6. Log the result in `examples/test_results.md`
-7. Run `python3 scripts/verify_models.py` to confirm provider setup
+1. Ensure `fable-config.yaml` exists in the skill directory with your provider/models
+2. Load the skill: `/skill fableous`
+3. Give a task: "Write a blog post about X"
+4. Verify all 6 stages complete
+5. Verify the FINAL.md is correct
+6. Check the WORK_LOG.md for completeness
+7. Log the result in `examples/test_results.md`
+8. Run `python3 scripts/verify_models.py` to confirm provider setup
 
 ## Code of Conduct
 
