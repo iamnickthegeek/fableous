@@ -95,6 +95,17 @@ See `SKILL.md` for the full async stage execution procedure.
 
 If `route_config.py set --stage X` finds that the primary provider's API key is not set, it falls back to the secondary provider. If secondary also fails, it falls back to tertiary. If none are configured, it reports failure and the orchestrator falls back to `run_stage.py` terminal mode.
 
+## Config File Discovery
+
+`route_config.py set --stage X` auto-discovers `fable-config.yaml` in this order:
+
+1. Explicit `--config path/to/fable-config.yaml` (if provided)
+2. Skill directory: `~/.hermes/skills/fableous/fable-config.yaml` (canonical location)
+3. Working directory: `./fable-config.yaml`
+4. Built-in `DEFAULT_ROUTING` (fallback)
+
+**Always verify** after `set` by running `route_config.py status` — confirm the model/provider match your fable-config.yaml, not the defaults. If they don't match, the config file wasn't found or the provider's API key isn't configured (triggering fallback to secondary/tertiary).
+
 ## Custom providers
 
 If the user's `fable-config.yaml` specifies a custom provider (not opencode-go, google, or openrouter), `route_config.py` sets `delegation.provider` to the custom provider name. `resolve_runtime_provider` attempts to resolve it. If it can't, `delegate_task` returns an error, and the orchestrator falls back to terminal mode.

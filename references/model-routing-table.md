@@ -1,6 +1,8 @@
-# Model Routing Table — v7
+# Model Routing Table — v8
 
-Quick lookup for the Fable Orchestrator v7. The routing table is the authority. Do not ask the user which model to use.
+Quick lookup for the Fable Orchestrator v8. The routing table is the authority. Do not ask the user which model to use.
+
+**v8.0 note:** The choice between full routing and single-model is not only a cost decision — it's a quality/character decision. See SKILL.md §Quality Tradeoffs and `references/token-budget-mode.md` for the full tradeoff analysis and deliverable-type-to-mode decision guidance.
 
 ## Primary / Secondary / Tertiary Chains
 
@@ -75,6 +77,12 @@ The skill reads the user's Hermes config to determine available providers:
 4. Map providers to stages: use best available model for each stage type
 
 If a `fable-config.yaml` exists in the project directory, it overrides all defaults.
+
+## NVIDIA NIM as Unified Provider
+
+NVIDIA's NIM marketplace (`https://build.nvidia.com`) hosts free inference endpoints for models from multiple vendors under a single `NVIDIA_API_KEY`. This allows true cross-family verification with one credential instead of juggling multiple providers.
+
+See `references/nvidia-nim-unified-provider.md` for the aspiration verified model list, family classification, and a complete sample `fable-config.yaml`.
 
 ## Notes
 

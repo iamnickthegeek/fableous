@@ -15,39 +15,8 @@ try:
 except ImportError:  # pragma: no cover
     yaml = None
 
-# Default routing table for Fable v6.
-DEFAULT_ROUTING = {
-    "research": {
-        "primary": {"model": "deepseek-v4-flash", "provider": "opencode-go"},
-        "secondary": {"model": "gemini-2.5-flash-lite", "provider": "google"},
-        "tertiary": {"model": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free", "provider": "openrouter"},
-    },
-    "plan": {
-        "primary": {"model": "glm-5.1", "provider": "opencode-go"},
-        "secondary": {"model": "gemini-2.5-pro", "provider": "google"},
-        "tertiary": {"model": "deepseek-v4-pro", "provider": "opencode-go"},
-    },
-    "implement": {
-        "primary": {"model": "kimi-k2.7-code", "provider": "opencode-go"},
-        "secondary": {"model": "kimi-k2.6", "provider": "opencode-go"},
-        "tertiary": {"model": "gemini-2.5-pro", "provider": "google"},
-    },
-    "verify": {
-        "primary": {"model": "deepseek-v4-pro", "provider": "opencode-go"},
-        "secondary": {"model": "gemini-2.5-pro", "provider": "google"},
-        "tertiary": {"model": "kimi-k2.6", "provider": "opencode-go"},
-    },
-    "critique": {
-        "primary": {"model": "glm-5.1", "provider": "opencode-go"},
-        "secondary": {"model": "gemini-2.5-pro", "provider": "google"},
-        "tertiary": {"model": "kimi-k2.6", "provider": "opencode-go"},
-    },
-    "consolidate": {
-        "primary": {"model": "deepseek-v4-pro", "provider": "opencode-go"},
-        "secondary": {"model": "glm-5.1", "provider": "opencode-go"},
-        "tertiary": {"model": "gemini-2.5-pro", "provider": "google"},
-    },
-}
+# No default routing table. All routing MUST come from fable-config.yaml.
+# See templates/fable-config-nvidia-nim.yaml for a complete example.
 
 # Map provider names to the environment variables they need.
 PROVIDER_ENV = {
@@ -60,6 +29,7 @@ PROVIDER_ENV = {
     "xai": "XAI_API_KEY",
     "kimi": "KIMI_API_KEY",
     "glm": "GLM_API_KEY",
+    "nvidia": "NVIDIA_API_KEY",
 }
 
 
@@ -81,27 +51,51 @@ def load_dotenv(path: Path | None = None) -> dict:
 
 
 def load_routing(config_path: str | None) -> dict:
-    """Load routing table from fable-config.yaml or use defaults."""
-    if not config_path:
-        return DEFAULT_ROUTING.copy()
+    """Load routing table from fable-config.yaml.
 
-    path = Path(config_path)
-    if not path.exists():
-        raise FileNotFoundError(f"config file not found: {config_path}")
+    Resolution order:
+    1. Explicit config_path argument (if provided)
+    2. Skill directory: ~/.hermes/skills/fableous/fable-config.yaml
+    3. Working directory: ./fable-config.yaml
 
+    Raises RuntimeError if no config file is found — there is no fallback
+    default routing table. The user MUST provide a fable-config.yaml.
+    """
+    if config_path:
+        path = Path(config_path)
+        if not path.exists():
+            raise FileNotFoundError(f"config file not found: {config_path}")
+        return _load_yaml_routing(path)
+
+    # Auto-discover: skill directory first
+    skill_config = Path.home() / ".hermes" / "skills" / "fableous" / "fable-config.yaml"
+    if skill_config.exists():
+        return _load_yaml_routing(skill_config)
+
+    # Auto-discover: working directory
+    cwd_config = Path.cwd() / "fable-config.yaml"
+    if cwd_config.exists():
+        return _load_yaml_routing(cwd_config)
+
+    raise RuntimeError(
+        "No fable-config.yaml found. Create one at "
+        "~/.hermes/skills/fableous/fable-config.yaml or in the project directory. "
+        "See templates/fable-config-nvidia-nim.yaml for an example."
+    )
+
+
+def _load_yaml_routing(path: Path) -> dict:
+    """Load routing dict from a fable-config.yaml file."""
     if yaml is None:
         raise RuntimeError(
             "PyYAML is required to read .yaml config files. "
             "Install it with: pip install pyyaml"
         )
-
     with path.open() as f:
         data = yaml.safe_load(f)
-
     if data and "routing" in data:
         return data["routing"]
-
-    raise ValueError("config has no 'routing' key")
+    raise ValueError(f"config has no 'routing' key: {path}")
 
 
 def flatten_entries(routing: dict) -> list[dict]:

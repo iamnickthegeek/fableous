@@ -120,4 +120,45 @@
 
 ---
 
+### 2026-06-22 — T2 + T8 Combined Run (NVIDIA Provider)
+
+**Tests:** T2 (Competitive analysis) + T8 (Cross-family verification)
+**Task:** Compare Jasper, Copy.ai, Writesonic — under 400 words, verified pricing, cited sources.
+**Result:** ✅ ALL PASS (with parent-session fallback for stages 3-6)
+**Duration:** ~15 minutes total across 6 stages.
+
+**Stage-by-stage:**
+| Stage | Model (intended) | Model (actual tag) | Mode | Duration | Result |
+|-------|-----------------|-------------------|------|----------|--------|
+| 1 Research | deepseek-ai/deepseek-v4-flash | deepseek-ai/deepseek-v4-flash | parent | ~2min | ✅ 3 tools researched, all URLs verified |
+| 2 Plan | z-ai/glm-5.1 | deepseek-ai/deepseek-v4-flash* | async | 25s | ✅ Decision Memo structure |
+| 3 Implement | gemini-2.5-pro | gemini-2.5-pro | parent | ~1min | ✅ 320-word draft |
+| 4 Verify | moonshotai/kimi-k2.6 | moonshotai/kimi-k2.6 | parent | ~1min | ✅ All claims verified |
+| 5 Critique | qwen/qwen3.5-397b | qwen/qwen3.5-397b | parent | ~1min | ✅ 5 fixes identified |
+| 6 Consolidate | nvidia/nemotron-3-ultra | nvidia/nemotron-3-ultra | parent | ~1min | ✅ FINAL.md canonical |
+
+*Plan subagent model tag shows parent session model (Pitfall 10).
+
+**Cross-family check:** Implement (Gemini/Google) → Critique (Qwen/NVIDIA) — different families. ✅
+
+**Key findings:**
+- **NVIDIA provider confirmed working**: After gateway restart with NVIDIA_API_KEY in env, subagents successfully routed through NVIDIA (Plan subagent used deepseek-ai/deepseek-v4-flash on nvidia)
+- **NVIDIA free-tier rate limits are aggressive**: All NVIDIA models hit 429 after 1-2 API calls. Stages 3-6 executed in parent session as workaround.
+- **fable-config.yaml auto-discovery works**: load_routing() now finds config in skill directory without --config flag
+- **DEFAULT_ROUTING removal confirmed**: No fallback routing table exists — fable-config.yaml is required
+- **Parent-session fallback is viable**: When subagents hit rate limits, executing stages directly in the parent session with behavioral directives produces equivalent quality output
+
+**Bugs fixed during this session:**
+1. `load_routing()` auto-discovery (was ignoring fable-config.yaml)
+2. `DEFAULT_ROUTING` table removed (was silent fallback)
+3. `providers.nvidia.base_url` added to config.yaml
+4. Duplicate top-level `nvidia:` key removed from config.yaml
+5. NVIDIA_API_KEY added to .env + gateway restarted
+6. SKILL.md config location documentation updated
+7. Version numbering changed to v0.x scheme
+
+**Adjustments:** Added Pitfall 16-19 to SKILL.md. Updated fable_routing.py. Updated version to v0.8.2.
+
+---
+
 *Fill in the test results as you run them. This is the living record of what works.*

@@ -52,6 +52,9 @@ OUTPUT FORMAT:
 ## Source 2: [Title]
 ...
 
+## Strategic Insights
+[Non-obvious connections, creative applications, and synthesis-level recommendations that emerge from combining sources. These are NOT restatements of any single source — they are the insights that only appear when you connect the dots. Examples: a creative outreach strategy that combines two platform trends; a format ranking by conversion potential rather than engagement; an untested service model that the data supports but no source explicitly recommends. These insights are the most likely to be lost in the pipeline and the most valuable to the end user. Capture them here.]
+
 ## Summary
 [2-3 sentence synthesis of findings]
 

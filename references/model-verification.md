@@ -1,6 +1,6 @@
-# Model Verification — v7 (updated)
+# Model Verification — v8 (updated)
 
-Cross-family verification is the core anti-hallucination measure of the Fable Orchestrator. You MUST verify the model used by every subagent. Critique and Consolidation MUST run on a different model family than Implementation.
+Cross-family verification is the core anti-hallucination measure of the Fable Orchestrator. You MUST verify the model used by every subagent. Critique and Consolidation MUST run on a different model family than Implementation — **unless single-model flatlining mode is explicitly active** (see SKILL.md §Token-Budget Mode, Sub-mode 2). In single-model mode, cross-family verification is waived but the pipeline structure (separate verify and critique stages with distinct prompts) still catches most errors.
 
 ## The Problem
 
@@ -74,6 +74,8 @@ In the June 2026 live test of a full 6-stage Fable run, every `delegate_task` re
 | Consolidate | Config cycling | Required — MUST be different family from Implement | Re-run config cycling, then terminal fallback |
 
 You MAY use `delegate_task` without config cycling for simple tasks where model assignment does not matter, but never rely on it for model routing.
+
+**Single-model flatlining exception (v7.3.2+):** When the user explicitly bans all model routing, `route_config.py` is skipped entirely. The parent session model IS the target model; `delegate_task` inherits it naturally. Cross-family verification is waived. The model tag in stage outputs still serves as audit trail, but verification is reduced to checking the output file header matches the parent model. See SKILL.md §Token-Budget Mode, Sub-mode 2, "Edge case."
 
 ## Cross-Family Verification
 

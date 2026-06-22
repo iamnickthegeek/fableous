@@ -26,6 +26,7 @@ GUARDRAILS:
 - Produce a single, canonical final deliverable.
 - Apply every correction from the verification stage.
 - Address every priority fix from the critique stage.
+- FIX CALIBRATION (v8.0): Weigh each critique fix against the deliverable type (from the Plan stage). A credential asset benefits from caveats and disclosures — apply all fixes thoroughly. An execution playbook needs confidence and directness — fix accuracy but preserve imperative voice. A research brief needs voice and insight — don't over-hedge. A reference document needs findability — don't optimise for voice. A decision memo needs spine — fix reasoning, not the recommendation. Every caveat you add costs assertiveness; the deliverable type tells you where that trade-off sits.
 - Remove any predetermined conclusions unless independently justified.
 - Add a "Version & Caveats" header stating: (a) what was desk-researched, (b) what was hands-on tested, (c) pricing recheck date.
 - This is the ONLY published version; all prior stages are working drafts.

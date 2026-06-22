@@ -34,10 +34,12 @@ INSTRUCTIONS:
 3. Verify all URLs are live.
 4. Check for internal consistency (numbers, dates, pricing).
 5. Flag any hallucination or data that shifts between stages.
-6. List all factual errors with exact corrections.
-7. Output a "Corrections to apply" section.
-8. Save your complete output to: {{output_path}}
-9. Return only a brief status message.
+6. CROSS-RUN RECONCILIATION (v8.0): Use search_files to look for prior run outputs (FINAL.md, stage*.md) in the project directory. If prior outputs exist, read them and compare key stats against the current implementation. Flag any discrepancies (same metric at different values, contradictory trends). Log in a "Cross-Run Discrepancies" section.
+7. METHODOLOGY CONSISTENCY (v8.0): For research-type tasks, pick 3 key stats that appear across multiple sources. Verify they use the same measurement methodology (e.g., engagement rate definition, sample size, time window). Flag stats where sources may measure different things but present them as comparable.
+8. List all factual errors with exact corrections.
+9. Output a "Corrections to apply" section.
+10. Save your complete output to: {{output_path}}
+11. Return only a brief status message.
 
 OUTPUT FORMAT:
 ```markdown
@@ -61,6 +63,17 @@ OUTPUT FORMAT:
 1. [Data point]: [why it's suspicious]
    - Found in: [which stage]
    - Not found in: [which source]
+
+## Cross-Run Discrepancies (v8.0)
+[If prior run outputs were found in the project directory, list any stat discrepancies between runs. If no prior outputs exist, write "No prior run outputs found in project directory."]
+- [Metric]: Current run says [X], prior run says [Y]. [Likely cause: different source / different methodology / data drift]
+- [Metric]: ...
+
+## Methodology Consistency (v8.0)
+[For research-type tasks. If not a research task, write "Not applicable — non-research deliverable."]
+- [Stat 1]: Sources [A] and [B] both cite this metric. [Same / different] methodology. [Note any definitional differences.]
+- [Stat 2]: ...
+- [Stat 3]: ...
 
 ## Pricing Volatility
 - [Tool]: [price change noted]

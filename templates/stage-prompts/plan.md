@@ -32,17 +32,21 @@ don't retry — trust the config.
 
 INSTRUCTIONS:
 1. Analyze the task and research findings.
-2. Define the architecture, structure, or approach.
-3. List all files, sections, or components needed.
-4. Segment the audience into at least 3 tiers.
-5. Map recommendations to tiers.
-6. Include a "Methodology & Caveats" section.
-7. Save your complete output to: {{output_path}}
-8. Return only a brief status message.
+2. Classify the deliverable type (Research Brief, Execution Playbook, Credential Asset, Reference Document, or Decision Memo). Pick the PRIMARY purpose — the reason the user wants this document.
+3. Define the architecture, structure, or approach.
+4. List all files, sections, or components needed.
+5. Segment the audience into at least 3 tiers.
+6. Map recommendations to tiers.
+7. Include a "Methodology & Caveats" section.
+8. Save your complete output to the specified file.
+9. Return only a brief status message.
 
 OUTPUT FORMAT:
 ```markdown
 # Plan — {{task_name}}
+
+**Deliverable Type:** [Research Brief / Execution Playbook / Credential Asset / Reference Document / Decision Memo]
+**Deliverable Type Rationale:** [1-2 sentences explaining why this type fits the user's goal]
 
 ## Architecture
 [High-level structure or approach]

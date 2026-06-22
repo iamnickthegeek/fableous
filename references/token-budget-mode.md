@@ -65,3 +65,28 @@ Token-budget mode (single cheap model, all stages) still provides real value:
 - The user expects production-quality output with no tradeoffs
 - The task requires deep reasoning or subtle judgment calls
 - You haven't been told to economise — the default routing table is the default for a reason
+
+## Quality Tradeoffs Beyond Cost (v8.0)
+
+The single-model vs. multi-model choice is not only about cost. Analysis of three deliverables produced from the same prompt (one single-pass, one single-model staged, one multi-model staged) revealed distinct quality character differences:
+
+**Single-model flatlining produces:**
+- **Voice consistency** — the same model's tone carries through all stages. No "written by committee" feel.
+- **Deeper self-critique** — the same model applying its critical lens across multiple passes develops coherent internal critique. It knows its own blind spots better than a different model that lacks context.
+- **Consistent data interpretation** — one model reads sources the same way throughout, reducing the risk of interpretive drift between stages.
+- **Risk: Cognitive monoculture** — the model's blind spots propagate through every stage. If the model has a systematic bias (e.g., over-trusting vendor sources), no stage breaks it.
+
+**Multi-model routing produces:**
+- **Creative range** — different model families excel at different things. One model may produce better structured templates, another better strategic framing, another sharper critique. The deliverable benefits from this range.
+- **Cross-family error catching** — a weakness one model can't see in its own output may be obvious to a different architecture.
+- **Risk: Voice inconsistency** — the document may feel like it was written by different people. Tone shifts between sections. Data discrepancies can emerge when different research passes find different sources.
+- **Risk: Over-hedging** — when a different model family critiques the implementation, it may apply fixes that don't suit the deliverable type (e.g., adding legal-grade caveats to a punchy research brief). The v8.0 fix calibration addresses this.
+
+**Decision guidance by deliverable type:**
+| Deliverable Type | Recommended Mode | Why |
+|---|---|---|
+| Research Brief | Single-model | Voice consistency matters most |
+| Execution Playbook | Multi-model | Creative range produces better templates and scripts |
+| Credential Asset | Multi-model | Cross-family verification strengthens defensibility |
+| Reference Document | Either | Both work; choose based on cost |
+| Decision Memo | Multi-model | Multiple perspectives improve the analysis |
