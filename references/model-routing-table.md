@@ -1,32 +1,32 @@
-# Model Routing Table — v8
+# Model Routing Table — v0.8.0
 
-Quick lookup for the Fable Orchestrator v8. The routing table is the authority. Do not ask the user which model to use.
+Quick lookup for the Fable Orchestrator v0.8.0. The routing table is the authority. Do not ask the user which model to use.
 
-**v8.0 note:** The choice between full routing and single-model is not only a cost decision — it's a quality/character decision. See SKILL.md §Quality Tradeoffs and `references/token-budget-mode.md` for the full tradeoff analysis and deliverable-type-to-mode decision guidance.
+**v0.8.0 note:** The choice between full routing and single-model is not only a cost decision — it's a quality/character decision. See SKILL.md §Quality Tradeoffs and `references/token-budget-mode.md` for the full tradeoff analysis and deliverable-type-to-mode decision guidance.
 
 ## Primary / Secondary / Tertiary Chains
 
 | Stage | Primary | Secondary | Tertiary | Key Rule |
 |-------|---------|-----------|----------|----------|
-| Research | `opencode-go/deepseek-v4-flash` | `google/gemini-2.5-flash-lite` | `openrouter/nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free` | Fast, broad, cheap |
-| Planning | `opencode-go/glm-5.1` | `google/gemini-2.5-pro` | `opencode-go/deepseek-v4-pro` | Structured reasoning |
+| Research | `opencode-go/deepseek-v0.4.0-flash` | `google/gemini-2.5-flash-lite` | `openrouter/nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free` | Fast, broad, cheap |
+| Planning | `opencode-go/glm-5.1` | `google/gemini-2.5-pro` | `opencode-go/deepseek-v0.4.0-pro` | Structured reasoning |
 | Implementation | `opencode-go/kimi-k2.7-code` | `opencode-go/kimi-k2.6` | `google/gemini-2.5-pro` | Code-specialized |
-| Verification | `opencode-go/deepseek-v4-pro` | `google/gemini-2.5-pro` | `opencode-go/kimi-k2.6` | Different family from implementer |
+| Verification | `opencode-go/deepseek-v0.4.0-pro` | `google/gemini-2.5-pro` | `opencode-go/kimi-k2.6` | Different family from implementer |
 | Critique | `opencode-go/glm-5.1` | `google/gemini-2.5-pro` | `opencode-go/kimi-k2.6` | Independent evaluation |
-| Consolidation | `opencode-go/deepseek-v4-pro` | `opencode-go/glm-5.1` | `google/gemini-2.5-pro` | Reads all stages, produces canonical output |
+| Consolidation | `opencode-go/deepseek-v0.4.0-pro` | `opencode-go/glm-5.1` | `google/gemini-2.5-pro` | Reads all stages, produces canonical output |
 
 ## Hermes Config Set Commands
 
-For config cycling (v7 method), use `route_config.py set --stage NAME` or run these commands directly:
+For config cycling (v0.7.0 method), use `route_config.py set --stage NAME` or run these commands directly:
 
 | Stage | Primary | Config Commands |
 |-------|---------|-----------------|
-| Research | deepseek-v4-flash (Opencode Go) | `hermes config set delegation.model deepseek-v4-flash && hermes config set delegation.provider opencode-go && hermes config set delegation.api_key "" && hermes config set delegation.base_url "" && hermes config set delegation.api_mode ""` |
+| Research | deepseek-v0.4.0-flash (Opencode Go) | `hermes config set delegation.model deepseek-v0.4.0-flash && hermes config set delegation.provider opencode-go && hermes config set delegation.api_key "" && hermes config set delegation.base_url "" && hermes config set delegation.api_mode ""` |
 | Plan | glm-5.1 (Opencode Go) | `hermes config set delegation.model glm-5.1 && hermes config set delegation.provider opencode-go && hermes config set delegation.api_key "" && hermes config set delegation.base_url "" && hermes config set delegation.api_mode ""` |
 | Implement | kimi-k2.7-code (Opencode Go) | `hermes config set delegation.model kimi-k2.7-code && hermes config set delegation.provider opencode-go && hermes config set delegation.api_key "" && hermes config set delegation.base_url "" && hermes config set delegation.api_mode ""` |
-| Verify | deepseek-v4-pro (Opencode Go) | `hermes config set delegation.model deepseek-v4-pro && hermes config set delegation.provider opencode-go && hermes config set delegation.api_key "" && hermes config set delegation.base_url "" && hermes config set delegation.api_mode ""` |
+| Verify | deepseek-v0.4.0-pro (Opencode Go) | `hermes config set delegation.model deepseek-v0.4.0-pro && hermes config set delegation.provider opencode-go && hermes config set delegation.api_key "" && hermes config set delegation.base_url "" && hermes config set delegation.api_mode ""` |
 | Critique | glm-5.1 (Opencode Go) | `hermes config set delegation.model glm-5.1 && hermes config set delegation.provider opencode-go && hermes config set delegation.api_key "" && hermes config set delegation.base_url "" && hermes config set delegation.api_mode ""` |
-| Consolidate | deepseek-v4-pro (Opencode Go) | `hermes config set delegation.model deepseek-v4-pro && hermes config set delegation.provider opencode-go && hermes config set delegation.api_key "" && hermes config set delegation.base_url "" && hermes config set delegation.api_mode ""` |
+| Consolidate | deepseek-v0.4.0-pro (Opencode Go) | `hermes config set delegation.model deepseek-v0.4.0-pro && hermes config set delegation.provider opencode-go && hermes config set delegation.api_key "" && hermes config set delegation.base_url "" && hermes config set delegation.api_mode ""` |
 
 ## Critical Rules
 
@@ -40,7 +40,7 @@ For config cycling (v7 method), use `route_config.py set --stage NAME` or run th
 
 | Family | Models | Provider |
 |--------|--------|----------|
-| DeepSeek | deepseek-v4-flash, deepseek-v4-pro | Opencode Go |
+| DeepSeek | deepseek-v0.4.0-flash, deepseek-v0.4.0-pro | Opencode Go |
 | GLM | glm-5.1 | Opencode Go |
 | Kimi | kimi-k2.7-code, kimi-k2.6 | Opencode Go |
 | Gemini | gemini-2.5-flash-lite, gemini-2.5-pro | Google |
@@ -89,4 +89,4 @@ See `references/nvidia-nim-unified-provider.md` for the aspiration verified mode
 - GLM 5.2 will replace GLM 5.1 for planning and critique when tested and confirmed better.
 - Kimi 2.7 Code availability should be verified via `hermes models` before routing.
 - DeepSeek V4 Flash and Pro are reasoning models — they may expose thinking tokens and take longer to respond.
-- Config cycling is the v7 default. Use `route_config.py set --stage NAME` to set both model and provider. When falling back to terminal mode, both `-m` and `--provider` flags are required.
+- Config cycling is the v0.7.0 default. Use `route_config.py set --stage NAME` to set both model and provider. When falling back to terminal mode, both `-m` and `--provider` flags are required.
