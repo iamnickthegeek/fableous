@@ -1,4 +1,4 @@
-# Model Verification — v8 (updated)
+# Model Verification — v0.8.0 (updated)
 
 Cross-family verification is the core anti-hallucination measure of the Fable Orchestrator. You MUST verify the model used by every subagent. Critique and Consolidation MUST run on a different model family than Implementation — **unless single-model flatlining mode is explicitly active** (see SKILL.md §Token-Budget Mode, Sub-mode 2). In single-model mode, cross-family verification is waived but the pipeline structure (separate verify and critique stages with distinct prompts) still catches most errors.
 
@@ -17,7 +17,7 @@ When `route_config.py set --stage X` completes, the model/provider is guaranteed
 ```
 terminal(command="python3 ~/.hermes/skills/fableous/scripts/route_config.py set --stage research")
 delegate_task(goal="...", context="...", toolsets=["web", "file"])
-terminal(command="python3 ~/.hermes/skills/fableous/scripts/route_config.py verify --output stage1_research.md --expected-model deepseek-v4-flash")
+terminal(command="python3 ~/.hermes/skills/fableous/scripts/route_config.py verify --output stage1_research.md --expected-model deepseek-v0.4.0-flash")
 ```
 
 ### Method 2: Model Tag (Audit Trail)
@@ -34,7 +34,7 @@ don't retry — trust the config.
 Use `route_config.py verify` to check the tag:
 
 ```bash
-python3 scripts/route_config.py verify --output stage1_research.md --expected-model deepseek-v4-flash
+python3 scripts/route_config.py verify --output stage1_research.md --expected-model deepseek-v0.4.0-flash
 ```
 
 - **Exit 0**: Tag matches. Confirmed.
@@ -47,16 +47,16 @@ If config cycling fails twice, use `run_stage.py --stage X --prompt "..."` which
 
 ## Subagent Self-Report Is Unreliable (Live Test Evidence)
 
-In the June 2026 live test of a full 6-stage Fable run, every `delegate_task` result summary's `"model"` field reported `"deepseek-v4-pro"` — the parent session model — regardless of what `route_config.py set` had configured. This is a consistent and reproducible behavior, not a one-off anomaly.
+In the June 2026 live test of a full 6-stage Fable run, every `delegate_task` result summary's `"model"` field reported `"deepseek-v0.4.0-pro"` — the parent session model — regardless of what `route_config.py set` had configured. This is a consistent and reproducible behavior, not a one-off anomaly.
 
 | Stage | Config routing set to | Summary `"model"` field | Output `[MODEL:]` tag | Tag verified? |
 |-------|----------------------|------------------------|----------------------|:---:|
-| 1 Research | deepseek-v4-flash | deepseek-v4-pro | deepseek-v4-flash | ✅ |
-| 2 Plan | glm-5.1 | deepseek-v4-pro | glm-5.1 | ✅ |
-| 3 Implement | kimi-k2.7-code | deepseek-v4-pro | kimi-k2.7-code | ✅ |
-| 4 Verify | deepseek-v4-pro | deepseek-v4-pro | deepseek-v4-pro | ✅ |
-| 5 Critique | glm-5.1 | deepseek-v4-pro | glm-5.1 | ✅ |
-| 6 Consolidate | deepseek-v4-pro | deepseek-v4-pro | deepseek-v4-pro | ✅ |
+| 1 Research | deepseek-v0.4.0-flash | deepseek-v0.4.0-pro | deepseek-v0.4.0-flash | ✅ |
+| 2 Plan | glm-5.1 | deepseek-v0.4.0-pro | glm-5.1 | ✅ |
+| 3 Implement | kimi-k2.7-code | deepseek-v0.4.0-pro | kimi-k2.7-code | ✅ |
+| 4 Verify | deepseek-v0.4.0-pro | deepseek-v0.4.0-pro | deepseek-v0.4.0-pro | ✅ |
+| 5 Critique | glm-5.1 | deepseek-v0.4.0-pro | glm-5.1 | ✅ |
+| 6 Consolidate | deepseek-v0.4.0-pro | deepseek-v0.4.0-pro | deepseek-v0.4.0-pro | ✅ |
 
 **Rule:** Never trust the `delegate_task` result summary's `"model"` field. It reports the session wrapper's identity, not which model actually processed the subagent's API calls. The output file's `[MODEL:]` tag and `route_config.py verify` are the only reliable indicators.
 
@@ -75,7 +75,7 @@ In the June 2026 live test of a full 6-stage Fable run, every `delegate_task` re
 
 You MAY use `delegate_task` without config cycling for simple tasks where model assignment does not matter, but never rely on it for model routing.
 
-**Single-model flatlining exception (v7.3.2+):** When the user explicitly bans all model routing, `route_config.py` is skipped entirely. The parent session model IS the target model; `delegate_task` inherits it naturally. Cross-family verification is waived. The model tag in stage outputs still serves as audit trail, but verification is reduced to checking the output file header matches the parent model. See SKILL.md §Token-Budget Mode, Sub-mode 2, "Edge case."
+**Single-model flatlining exception (v0.7.3.2+):** When the user explicitly bans all model routing, `route_config.py` is skipped entirely. The parent session model IS the target model; `delegate_task` inherits it naturally. Cross-family verification is waived. The model tag in stage outputs still serves as audit trail, but verification is reduced to checking the output file header matches the parent model. See SKILL.md §Token-Budget Mode, Sub-mode 2, "Edge case."
 
 ## Cross-Family Verification
 
@@ -83,7 +83,7 @@ You MAY use `delegate_task` without config cycling for simple tasks where model 
 
 | Family | Models | Provider |
 |--------|--------|----------|
-| DeepSeek | deepseek-v4-flash, deepseek-v4-pro | Opencode Go |
+| DeepSeek | deepseek-v0.4.0-flash, deepseek-v0.4.0-pro | Opencode Go |
 | GLM | glm-5.1 | Opencode Go |
 | Kimi | kimi-k2.7-code, kimi-k2.6 | Opencode Go |
 | Gemini | gemini-2.5-flash-lite, gemini-2.5-pro | Google |
@@ -110,7 +110,7 @@ If a model fails (rate limit, auth error, 500, verification failure):
 3. If that fails, retry with the fallback (`run_stage.py` terminal mode).
 4. If all fail, mark the stage as blocked and `clarify` with the user.
 
-## What Changed From v6
+## What Changed From v0.6.0
 
 The old verification hierarchy put the model tag first and terminal spawn last. But the model tag was self-reported and unverifiable — the subagent could type anything regardless of which model actually ran. Now config cycling is the primary verification method because it controls routing at the infrastructure level. The tag is a confirmation check, not the sole indicator.
 
@@ -123,7 +123,7 @@ Every model verification result must be logged:
 | Stage | Intended | Actual | Verified | Method | Result |
 |-------|----------|--------|----------|--------|--------|
 | Implement | kimi-k2.7-code | kimi-k2.7-code | Yes | config cycling | Pass |
-| Verify | deepseek-v4-pro | deepseek-v4-pro | Yes | config cycling | Pass |
+| Verify | deepseek-v0.4.0-pro | deepseek-v0.4.0-pro | Yes | config cycling | Pass |
 | Critique | glm-5.1 | glm-5.1 | Yes | config cycling | Pass |
 ```
 
