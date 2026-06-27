@@ -42,3 +42,15 @@ IMPLEMENTATION_PLAN*.md
 archive/
 ronin-partner-finder-case-study.md
 timeout-recovery-recipe.md
+
+# Non-essential reference files (internal/historical)
+references/delegate-task-model-routing-audit.md
+references/delegate-task-model-fallback.md
+references/model-mismatch-recovery.md
+references/native-first-gap-fillers.md
+references/pricing-verification-volatility.md
+references/skill-rename-procedure.md
+references/test-notes.md
+references/token-budget-mode.md
+references/v6-1-trigger-checklist.md
+references/github-publication.md
