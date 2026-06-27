@@ -21,7 +21,7 @@ todo(todos=[
 
 ### Step 2: Execute Stage 1 (Research)
 
-Delegate to `deepseek-v4-flash` via Opencode Go.
+Delegate to `deepseek-v0.4.0-flash` via Opencode Go.
 
 Prompt:
 ```
@@ -34,7 +34,7 @@ GUARDRAILS:
 - Lead with caveats.
 - Do not present vendor claims as verified facts.
 - Save your complete output to: ./stage1_research.md
-- At the top of your output, write exactly: [MODEL: deepseek-v4-flash, PROVIDER: opencode-go]
+- At the top of your output, write exactly: [MODEL: deepseek-v0.4.0-flash, PROVIDER: opencode-go]
 
 INSTRUCTIONS:
 - Gather 3+ sources on AI ghostwriting for digital marketers.
@@ -45,7 +45,7 @@ INSTRUCTIONS:
 
 After completion:
 - Read stage1_research.md
-- Verify first line: [MODEL: deepseek-v4-flash, PROVIDER: opencode-go]
+- Verify first line: [MODEL: deepseek-v0.4.0-flash, PROVIDER: opencode-go]
 - Verify URLs with web_search or terminal(curl)
 - Update todo
 - Update WORK_LOG.md
@@ -79,7 +79,7 @@ After completion:
 
 ### Step 5: Execute Stage 4 (Verify)
 
-Delegate to `deepseek-v4-pro` via Opencode Go.
+Delegate to `deepseek-v0.4.0-pro` via Opencode Go.
 
 After completion:
 - Verify model tag (different from Implement)
@@ -104,7 +104,7 @@ After completion:
 
 ### Step 7: Execute Stage 6 (Consolidate)
 
-Delegate to `deepseek-v4-pro` via Opencode Go.
+Delegate to `deepseek-v0.4.0-pro` via Opencode Go.
 
 Read all prior stage outputs. Apply corrections. Produce FINAL.md.
 
