@@ -1,4 +1,4 @@
-# Prompt Guardrails — v6
+# Prompt Guardrails — v0.6.0
 
 These guardrails are injected into every stage prompt. They are not suggestions — they are mandatory instructions. Use them verbatim when delegating a stage.
 
@@ -210,7 +210,7 @@ GUARDRAILS:
 |- Lead with caveats before specific numbers.
 |- Do not present vendor claims as verified facts unless independently corroborated.
 |- Save your complete output to: ./stage1_research.md
-- At the top of your output, write exactly: [MODEL: deepseek-v4-flash, PROVIDER: opencode-go]
+- At the top of your output, write exactly: [MODEL: deepseek-v0.4.0-flash, PROVIDER: opencode-go]
 This tag is an audit trail. The actual model routing was set via config cycling
 before this call. If the tag doesn't match the assigned model, report it but
 don't retry — trust the config.
