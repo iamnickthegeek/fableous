@@ -21,7 +21,7 @@ todo(todos=[
 
 ### Step 2: Execute Stage 1 (Research)
 
-Delegate to `deepseek-v4-flash` via Opencode Go.
+Delegate to `deepseek-v0.4.0-flash` via Opencode Go.
 
 Prompt:
 ```
@@ -34,7 +34,7 @@ GUARDRAILS:
 - Lead with caveats.
 - Do not present vendor claims as verified facts.
 - Save your complete output to: ./stage1_research.md
-- At the top of your output, write exactly: [MODEL: deepseek-v4-flash, PROVIDER: opencode-go]
+- At the top of your output, write exactly: [MODEL: deepseek-v0.4.0-flash, PROVIDER: opencode-go]
 
 INSTRUCTIONS:
 - Gather 5+ competitor landing pages (Jasper.ai, Copy.ai, Writesonic, etc.).
@@ -45,7 +45,7 @@ INSTRUCTIONS:
 
 After completion:
 - Read stage1_research.md
-- Verify first line: [MODEL: deepseek-v4-flash, PROVIDER: opencode-go]
+- Verify first line: [MODEL: deepseek-v0.4.0-flash, PROVIDER: opencode-go]
 - Verify URLs with terminal(curl):
   ```
   terminal(command="curl -s -o /dev/null -w '%{http_code}' https://jasper.ai")
@@ -118,7 +118,7 @@ read_file(path="./stage3_implement.md")
 
 If ANY check fails, the stage is NOT complete.
 
-Delegate to `deepseek-v4-pro` via Opencode Go.
+Delegate to `deepseek-v0.4.0-pro` via Opencode Go.
 
 **Critical:** Must be a different model family than Implement (DeepSeek vs Kimi).
 
@@ -166,7 +166,7 @@ INSTRUCTIONS:
 
 ### Step 7: Execute Stage 6 (Consolidate)
 
-Delegate to `deepseek-v4-pro` via Opencode Go.
+Delegate to `deepseek-v0.4.0-pro` via Opencode Go.
 
 Read all prior stage outputs. Apply corrections. Produce FINAL.md.
 
