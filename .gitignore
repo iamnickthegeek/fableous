@@ -41,3 +41,4 @@ IMPLEMENTATION_PLAN*.md
 # Internal / personal — not for GitHub distribution
 archive/
 ronin-partner-finder-case-study.md
+timeout-recovery-recipe.md
