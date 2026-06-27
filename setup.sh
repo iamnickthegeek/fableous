@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
-# Fable Orchestrator v6 — one-click setup for non-technical users.
+# Fable Orchestrator v0.6.0 — one-click setup for non-technical users.
 # This script installs the skill and runs a pre-flight provider check.
 
 set -e
 
-echo "Fable Orchestrator v6 Setup"
+echo "Fable Orchestrator v0.6.0 Setup"
 echo "============================"
 echo
 
