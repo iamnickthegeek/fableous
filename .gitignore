@@ -37,3 +37,7 @@ IMPLEMENTATION_PLAN*.md
 *.bak
 *.tmp
 *~
+
+# Internal / personal — not for GitHub distribution
+archive/
+ronin-partner-finder-case-study.md
