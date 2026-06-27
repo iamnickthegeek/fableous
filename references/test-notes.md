@@ -1,4 +1,4 @@
-# Test Notes — v6
+# Test Notes — v0.6.0
 
 ## Test Matrix
 
@@ -17,7 +17,7 @@
 
 ## Known Issues
 
-### Issue 1: `delegate_task` model parameter does not exist ✅ RESOLVED v7
+### Issue 1: `delegate_task` model parameter does not exist ✅ RESOLVED v0.7.0
 
 **Symptom:** Subagent ignores any `model` parameter and runs on the session default.
 **Root cause:** The `model` parameter doesn't exist in the tool schema, dispatch, or function signature. Confirmed by source-code audit.
@@ -50,7 +50,7 @@
 **Symptom:** No automated way to verify visual outputs (screenshots, diagrams).
 **Impact:** UI/UX tasks cannot be fully verified.
 **Workaround:** Manual verification for visual outputs.
-**Fix:** Planned for v6.1.
+**Fix:** Planned for v0.6.1.
 
 ### Issue 6: Dynamic replanning may create loops
 
@@ -91,17 +91,17 @@
 **Stage-by-stage:**
 | Stage | Model (intended) | Model (actual tag) | Duration | Result |
 |-------|-----------------|-------------------|----------|--------|
-| 1 Research | deepseek-v4-flash | deepseek-v4-flash | 5m 19s | ✅ 3 tools researched, all URLs verified live |
+| 1 Research | deepseek-v0.4.0-flash | deepseek-v0.4.0-flash | 5m 19s | ✅ 3 tools researched, all URLs verified live |
 | 2 Plan | glm-5.1 | glm-5.1 | 29s | ✅ Structure designed, recommendation-first |
 | 3 Implement | kimi-k2.7-code | kimi-k2.7-code | 28s | ✅ 360 words, all claims sourced |
-| 4 Verify | deepseek-v4-pro | deepseek-v4-pro | 1m 51s | ✅ PASS — 0 discrepancies (traceability audit) |
+| 4 Verify | deepseek-v0.4.0-pro | deepseek-v0.4.0-pro | 1m 51s | ✅ PASS — 0 discrepancies (traceability audit) |
 | 5 Critique | glm-5.1 | glm-5.1 | 1m 40s | ✅ 7 weaknesses, 5 priority fixes |
-| 6 Consolidate | deepseek-v4-pro | deepseek-v4-pro | 1m 44s | ✅ All fixes applied, FINAL.md canonical |
+| 6 Consolidate | deepseek-v0.4.0-pro | deepseek-v0.4.0-pro | 1m 44s | ✅ All fixes applied, FINAL.md canonical |
 
 **Cross-family check:** Implement (kimi) → Verify (deepseek) → Critique (glm) → Consolidate (deepseek) — all different families. ✅
 
 **Key findings:**
-- **Subagent self-report is unreliable**: Every summary's `"model"` field reported `"deepseek-v4-pro"` (parent session) regardless of config cycling. Only the output file tag and `route_config.py verify` are trustworthy. Documented as Pitfall 10.
+- **Subagent self-report is unreliable**: Every summary's `"model"` field reported `"deepseek-v0.4.0-pro"` (parent session) regardless of config cycling. Only the output file tag and `route_config.py verify` are trustworthy. Documented as Pitfall 10.
 - **Behavioral directives worked**: All stage outputs led with the outcome, grounded claims, and matched effort to the task type.
 - **Critique was genuinely useful**: Caught confirmation bias in the budget framing, flagged the misleading "0 errors" claim from verification (traceability audit ≠ quality audit), and noted that Copy.ai's distinguishing feature (GTM Workflows) is irrelevant to solo creators.
 - **Writesonic free tier ambiguity was caught and handled**: Three stages flagged it; final document gives a definitive verdict ("verify before relying on third-party claims").
@@ -130,8 +130,8 @@
 **Stage-by-stage:**
 | Stage | Model (intended) | Model (actual tag) | Mode | Duration | Result |
 |-------|-----------------|-------------------|------|----------|--------|
-| 1 Research | deepseek-ai/deepseek-v4-flash | deepseek-ai/deepseek-v4-flash | parent | ~2min | ✅ 3 tools researched, all URLs verified |
-| 2 Plan | z-ai/glm-5.1 | deepseek-ai/deepseek-v4-flash* | async | 25s | ✅ Decision Memo structure |
+| 1 Research | deepseek-ai/deepseek-v0.4.0-flash | deepseek-ai/deepseek-v0.4.0-flash | parent | ~2min | ✅ 3 tools researched, all URLs verified |
+| 2 Plan | z-ai/glm-5.1 | deepseek-ai/deepseek-v0.4.0-flash* | async | 25s | ✅ Decision Memo structure |
 | 3 Implement | gemini-2.5-pro | gemini-2.5-pro | parent | ~1min | ✅ 320-word draft |
 | 4 Verify | moonshotai/kimi-k2.6 | moonshotai/kimi-k2.6 | parent | ~1min | ✅ All claims verified |
 | 5 Critique | qwen/qwen3.5-397b | qwen/qwen3.5-397b | parent | ~1min | ✅ 5 fixes identified |
@@ -142,7 +142,7 @@
 **Cross-family check:** Implement (Gemini/Google) → Critique (Qwen/NVIDIA) — different families. ✅
 
 **Key findings:**
-- **NVIDIA provider confirmed working**: After gateway restart with NVIDIA_API_KEY in env, subagents successfully routed through NVIDIA (Plan subagent used deepseek-ai/deepseek-v4-flash on nvidia)
+- **NVIDIA provider confirmed working**: After gateway restart with NVIDIA_API_KEY in env, subagents successfully routed through NVIDIA (Plan subagent used deepseek-ai/deepseek-v0.4.0-flash on nvidia)
 - **NVIDIA free-tier rate limits are aggressive**: All NVIDIA models hit 429 after 1-2 API calls. Stages 3-6 executed in parent session as workaround.
 - **fable-config.yaml auto-discovery works**: load_routing() now finds config in skill directory without --config flag
 - **DEFAULT_ROUTING removal confirmed**: No fallback routing table exists — fable-config.yaml is required
