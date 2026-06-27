@@ -6,7 +6,7 @@
 - **Fixed `providers.nvidia.base_url`** in Hermes config (was missing, causing subagents to fall back to parent session provider).
 - **Removed duplicate top-level `nvidia:` key** from config.yaml that was conflicting with `providers.nvidia`.
 - **Added Pitfall 18** (NVIDIA provider setup requires base_url + env var in gateway process).
-- **Changed version numbering** from v1/v2/v3 to v0.1/v0.2/v0.3 scheme.
+- **Changed version numbering** from v0.1.0/v0.2.0/v0.3.0 to v0.1/v0.2/v0.3 scheme.
 
 ## v0.8.1
 
@@ -68,8 +68,8 @@
 - Uses only native Hermes tools: `todo`, `delegate_task`, `terminal`, `cronjob`, `session_search`, `memory`.
 - Added mandatory model verification, cross-family verification, dynamic replanning, strict 6-stage procedure.
 - Added helper scripts: `verify_models.py`, `auto_detect_providers.py`, `run_stage.py`, `fable_routing.py`.
-- Archived legacy v1-v5 code in `archive/`.
+- Archived legacy v0.1.0-v0.5.0 code in `archive/`.
 
 ## Earlier versions
 
-See `archive/v5-engine/CHANGELOG.md` for v1-v5 history.
+See `archive/v0.5.0-engine/CHANGELOG.md` for v0.1.0-v0.5.0 history.
