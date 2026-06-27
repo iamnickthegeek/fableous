@@ -1,4 +1,4 @@
-# Model-Mismatch Recovery in Fable v6
+# Model-Mismatch Recovery in Fable v0.6.0
 
 ## When this applies
 
@@ -14,7 +14,7 @@ Do not accept the contradictory output. Re-run the stage through the terminal wi
 
 ```bash
 hermes chat -q 'STAGE_PROMPT' \
-  -m deepseek-v4-pro \
+  -m deepseek-v0.4.0-pro \
   --provider opencode-go \
   -Q \
   -t web,terminal,file
@@ -22,7 +22,7 @@ hermes chat -q 'STAGE_PROMPT' \
 
 Replace the model/provider with the one required by the routing table for that stage. For example:
 
-- Stage 4 (Verify): `-m deepseek-v4-pro --provider opencode-go`
+- Stage 4 (Verify): `-m deepseek-v0.4.0-pro --provider opencode-go`
 - Stage 5 (Critique): `-m glm-5.1 --provider opencode-go`
 
 ## What to pass as the prompt
@@ -33,7 +33,7 @@ Read the subagent’s prior output into the terminal prompt, or write a focused 
 Read /path/to/stage4_verification.md and the generated lead sheets.
 Confirm the verification checks are sound and the outputs are internally consistent.
 Report pass/fail and any concerns.
-At the top of your response write exactly: [MODEL: deepseek-v4-pro, PROVIDER: opencode-go].
+At the top of your response write exactly: [MODEL: deepseek-v0.4.0-pro, PROVIDER: opencode-go].
 ```
 
 ## Log it
