@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Pre-flight model availability check for Fable Orchestrator v6.
+"""Pre-flight model availability check for Fable Orchestrator v0.6.0.
 
 Usage:
     python3 scripts/verify_models.py
@@ -88,7 +88,7 @@ def mask(value: str) -> str:
 
 def main() -> int:
     parser = argparse.ArgumentParser(
-        description="Pre-flight check for Fable Orchestrator v6 model routing."
+        description="Pre-flight check for Fable Orchestrator v0.6.0 model routing."
     )
     parser.add_argument(
         "--config",
@@ -105,7 +105,7 @@ def main() -> int:
     routing = load_routing(args.config)
     entries = flatten_entries(routing)
 
-    print("# Fable Orchestrator v6 \u2014 Model Pre-flight Check\n")
+    print("# Fable Orchestrator v0.6.0 \u2014 Model Pre-flight Check\n")
 
     hermes_ok, hermes_detail = check_hermes_config()
     print(f"Hermes config: {'OK' if hermes_ok else 'FAIL'} \u2014 {hermes_detail}\n")
@@ -145,7 +145,7 @@ def main() -> int:
 
     print()
     if all_ok:
-        print("All checks passed. You can run Fable Orchestrator v6.")
+        print("All checks passed. You can run Fable Orchestrator v0.6.0.")
         return 0
     print("Some checks failed. Fix the issues above before running Fable.")
     return 1
