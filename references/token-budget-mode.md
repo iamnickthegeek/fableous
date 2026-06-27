@@ -12,8 +12,8 @@ Explicit constraints: "Use the cheapest models in the routing table for each sta
 
 | Parameter | Value |
 |-----------|-------|
-| Model (all stages) | `deepseek-v4-flash` (Opencode Go) |
-| Config cycling | `route_config.py set --model deepseek-v4-flash --provider opencode-go` before each stage |
+| Model (all stages) | `deepseek-v0.4.0-flash` (Opencode Go) |
+| Config cycling | `route_config.py set --model deepseek-v0.4.0-flash --provider opencode-go` before each stage |
 | Mode | Sync (all stages sequential — no async overhead on a small task) |
 | Output dir | `/tmp/fable-test-7-1/` |
 | Stages | All 6: Research → Plan → Implement → Verify → Critique → Consolidate |
@@ -36,7 +36,7 @@ The Critique stage (Stage 5) independently flagged confirmation bias in the draf
 Token-budget mode (single cheap model, all stages) still provides real value:
 
 - **The pipeline structure catches errors even on weak models.** The verification subagent found the pricing discrepancies by checking live URLs. The critique subagent identified confirmation bias. Neither needed a stronger model — they just needed the structured pipeline.
-- **Config cycling works reliably with explicit model overrides.** `route_config.py set --model deepseek-v4-flash --provider opencode-go` set the model correctly for every stage. The subagent summary incorrectly reported `deepseek-v4-pro` (Pitfall 10), but output file model tags and `route_config.py verify` confirmed `deepseek-v4-flash` every time.
+- **Config cycling works reliably with explicit model overrides.** `route_config.py set --model deepseek-v0.4.0-flash --provider opencode-go` set the model correctly for every stage. The subagent summary incorrectly reported `deepseek-v0.4.0-pro` (Pitfall 10), but output file model tags and `route_config.py verify` confirmed `deepseek-v0.4.0-flash` every time.
 - **Token-budget mode is better than skipping Fable entirely.** A one-shot attempt would have published the wrong pricing and free-tier details. The pipeline caught both before consolidation.
 
 ## Output Files
@@ -66,7 +66,7 @@ Token-budget mode (single cheap model, all stages) still provides real value:
 - The task requires deep reasoning or subtle judgment calls
 - You haven't been told to economise — the default routing table is the default for a reason
 
-## Quality Tradeoffs Beyond Cost (v8.0)
+## Quality Tradeoffs Beyond Cost (v0.8.0)
 
 The single-model vs. multi-model choice is not only about cost. Analysis of three deliverables produced from the same prompt (one single-pass, one single-model staged, one multi-model staged) revealed distinct quality character differences:
 
@@ -80,7 +80,7 @@ The single-model vs. multi-model choice is not only about cost. Analysis of thre
 - **Creative range** — different model families excel at different things. One model may produce better structured templates, another better strategic framing, another sharper critique. The deliverable benefits from this range.
 - **Cross-family error catching** — a weakness one model can't see in its own output may be obvious to a different architecture.
 - **Risk: Voice inconsistency** — the document may feel like it was written by different people. Tone shifts between sections. Data discrepancies can emerge when different research passes find different sources.
-- **Risk: Over-hedging** — when a different model family critiques the implementation, it may apply fixes that don't suit the deliverable type (e.g., adding legal-grade caveats to a punchy research brief). The v8.0 fix calibration addresses this.
+- **Risk: Over-hedging** — when a different model family critiques the implementation, it may apply fixes that don't suit the deliverable type (e.g., adding legal-grade caveats to a punchy research brief). The v0.8.0 fix calibration addresses this.
 
 **Decision guidance by deliverable type:**
 | Deliverable Type | Recommended Mode | Why |
