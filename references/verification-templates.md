@@ -1,6 +1,6 @@
-# Verification Templates — v8
+# Verification Templates — v0.8.0
 
-Per-domain failable checks for the Fable Orchestrator v8. These checks are MANDATORY. A stage is NOT complete until ALL checks pass.
+Per-domain failable checks for the Fable Orchestrator v0.8.0. These checks are MANDATORY. A stage is NOT complete until ALL checks pass.
 
 **How to use:** Run these checks using native Hermes tools (`terminal`, `execute_code`, `web_search`, `read_file`). Do NOT write custom Python scripts.
 
@@ -86,7 +86,7 @@ Per-domain failable checks for the Fable Orchestrator v8. These checks are MANDA
    # Check that pricing data is consistent across sources
    ```
 
-5. **Cross-run reconciliation (v8.0)**
+5. **Cross-run reconciliation (v0.8.0)**
    ```
    search_files(pattern="*.md", path=".", target="files")
    # Look for prior run outputs (FINAL.md, stage*.md) in the project directory
@@ -96,7 +96,7 @@ Per-domain failable checks for the Fable Orchestrator v8. These checks are MANDA
    # This check does NOT fail the stage — it flags discrepancies for the user
    ```
 
-6. **Methodology consistency (v8.0)**
+6. **Methodology consistency (v0.8.0)**
    ```
    read_file(path="./stage3_implementation.md")
    # Pick 3 key stats that appear across multiple sources
@@ -114,7 +114,7 @@ Per-domain failable checks for the Fable Orchestrator v8. These checks are MANDA
 - Source cited but was not actually read
 - URL returns 404
 - Internal contradictions in the data
-- Stats from different sources presented as comparable without acknowledging methodology differences (v8.0)
+- Stats from different sources presented as comparable without acknowledging methodology differences (v0.8.0)
 
 ### What to do on failure
 - Re-run the research stage for the specific claim
