@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Auto-detect available providers and generate a Fable v6 routing table.
+"""Auto-detect available providers and generate a Fable v0.6.0 routing table.
 
 Usage:
     python3 scripts/auto_detect_providers.py
@@ -115,7 +115,7 @@ def _model_for(stage: str, provider: str) -> str | None:
 
 def main() -> int:
     parser = argparse.ArgumentParser(
-        description="Auto-detect providers and generate a Fable v6 routing table."
+        description="Auto-detect providers and generate a Fable v0.6.0 routing table."
     )
     parser.add_argument(
         "--save",
@@ -133,7 +133,7 @@ def main() -> int:
 
     providers = list(dict.fromkeys(env_providers + config_providers))
 
-    print("# Fable Orchestrator v6 \u2014 Provider Detection\n")
+    print("# Fable Orchestrator v0.6.0 \u2014 Provider Detection\n")
 
     print("Detected providers:")
     if providers:
