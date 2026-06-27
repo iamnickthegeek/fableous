@@ -68,7 +68,7 @@ git branch -m main
 
 # Commit everything
 git add .
-git commit -m "Initial release: v1.0.0 - Fable Orchestrator for Hermes"
+git commit -m "Initial release: v0.1.0.0 - Fable Orchestrator for Hermes"
 
 # Set remote to SSH URL
 git remote add origin git@github.com:iamnickthegeek/fableous.git
@@ -133,7 +133,7 @@ git commit -m "Remove cached files"
 
 ## Version bumps
 
-After v1.0.0, increment the version in these places:
+After v0.1.0.0, increment the version in these places:
 
 1. `fable_engine/__init__.py` — `__version__`
 2. `setup.py` — `version=`
@@ -144,7 +144,7 @@ After v1.0.0, increment the version in these places:
 Then commit and push:
 ```bash
 git add .
-git commit -m "Bump version to v1.1.0"
+git commit -m "Bump version to v0.1.1.0"
 git push
 ```
 
