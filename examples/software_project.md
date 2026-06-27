@@ -21,7 +21,7 @@ todo(todos=[
 
 ### Step 2: Execute Stage 1 (Research)
 
-Delegate to `deepseek-v4-flash` via Opencode Go.
+Delegate to `deepseek-v0.4.0-flash` via Opencode Go.
 
 Prompt:
 ```
@@ -33,7 +33,7 @@ GUARDRAILS:
 - If you cite benchmarks, label the exact source and date.
 - Do not present vendor claims as verified facts.
 - Save your complete output to: ./stage1_research.md
-- At the top of your output, write exactly: [MODEL: deepseek-v4-flash, PROVIDER: opencode-go]
+- At the top of your output, write exactly: [MODEL: deepseek-v0.4.0-flash, PROVIDER: opencode-go]
 
 INSTRUCTIONS:
 - Research FastAPI auth patterns (OAuth2, JWT, session-based).
@@ -135,7 +135,7 @@ terminal(command="bandit -r app/", workdir=".")
 
 If ANY check fails, the stage is NOT complete. Fix and re-run.
 
-Delegate to `deepseek-v4-pro` via Opencode Go.
+Delegate to `deepseek-v0.4.0-pro` via Opencode Go.
 
 **Critical:** Must be a different model family than Implement (DeepSeek vs Kimi).
 
@@ -180,7 +180,7 @@ INSTRUCTIONS:
 
 ### Step 7: Execute Stage 6 (Consolidate)
 
-Delegate to `deepseek-v4-pro` via Opencode Go.
+Delegate to `deepseek-v0.4.0-pro` via Opencode Go.
 
 Read all prior stage outputs. Apply corrections. Produce FINAL README and code.
 
