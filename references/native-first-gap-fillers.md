@@ -2,7 +2,7 @@
 
 Fable Orchestrator is a procedural layer on top of Hermes. It uses Hermes tools
 exclusively and adds logic only where Hermes leaves a gap. This document records
-the audit criteria so future contributors do not accidentally reintroduce v5-style
+the audit criteria so future contributors do not accidentally reintroduce v0.5.0-style
 engine code.
 
 ## Core principle
@@ -46,7 +46,7 @@ Before adding a Python script, a subprocess wrapper, or a state store, ask:
 1. Can a native Hermes tool do this? If yes, use it.
 2. Can a native Hermes tool do this with a small prompt change or flag? If yes, use it.
 3. Is the missing piece specific to Fable's routing/verification/workflow? If yes, add the smallest shim.
-4. Are you building a general-purpose engine, daemon, database, or state machine? If yes, stop. That is v5.
+4. Are you building a general-purpose engine, daemon, database, or state machine? If yes, stop. That is v0.5.0.
 
 ## Audit results
 
