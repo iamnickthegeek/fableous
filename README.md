@@ -76,7 +76,7 @@ Create a `fable-config.yaml` in the skill directory (`~/.hermes/skills/fableous/
 routing:
   research:
     primary:
-      model: deepseek-ai/deepseek-v4-flash
+      model: deepseek-ai/deepseek-v0.4.0-flash
       provider: nvidia
     secondary:
       model: gemini-2.5-flash-lite
@@ -157,7 +157,7 @@ Example config (NVIDIA NIM):
 
 | Stage | Primary | Provider |
 |-------|---------|----------|
-| Research | deepseek-ai/deepseek-v4-flash | nvidia |
+| Research | deepseek-ai/deepseek-v0.4.0-flash | nvidia |
 | Plan | z-ai/glm-5.1 | nvidia |
 | Implement | nvidia/nemotron-3-ultra-550b-a55b | nvidia |
 | Verify | moonshotai/kimi-k2.6 | nvidia |
@@ -301,7 +301,7 @@ Run these from the skill directory:
 ```bash
 # Config cycling — set model/provider before each stage
 python3 scripts/route_config.py set --stage research
-python3 scripts/route_config.py verify --output stage1.md --expected-model deepseek-v4-flash
+python3 scripts/route_config.py verify --output stage1.md --expected-model deepseek-v0.4.0-flash
 python3 scripts/route_config.py restore
 
 # Check providers and API keys
@@ -346,7 +346,7 @@ fableous/
 │   ├── guardrails.md             # Prompt guardrails per stage
 │   ├── work-log-template.md      # Structured handoff protocol
 │   ├── replanning-triggers.md    # When and how to replan
-│   ├── v6-1-trigger-checklist.md # When to invoke Fableous, when to skip
+│   ├── v0.6.0-1-trigger-checklist.md # When to invoke Fableous, when to skip
 │   ├── delegate-task-model-routing-audit.md  # Source-code evidence
 │   ├── delegate-task-model-fallback.md       # Config cycling → terminal fallback
 │   ├── timeout-recovery-recipe.md            # Recovering from subagent timeouts
@@ -383,7 +383,7 @@ fableous/
 │   ├── software_project.md       # FastAPI example
 │   ├── research_report.md        # Competitive analysis example
 │   └── test_results.md           # Living test log
-└── archive/                      # Old v1-v5 engine code and planning docs
+└── archive/                      # Old v0.1.0-v0.5.0 engine code and planning docs
 ```
 
 ---
