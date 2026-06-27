@@ -42,7 +42,7 @@ The value is the loop: decompose before acting, route to the right model for eac
 - It does not replace domain skills. Use `superpowers` for software, `research-workflows` for research, `jkd-content` for writing.
 - It does not run on trivial tasks. One-shot work with an obvious approach skips this loop entirely.
 
-## When to Trigger (v6.1 Checklist)
+## When to Trigger (v0.6.1 Checklist)
 
 Fable is powerful but not free. Use this checklist before invoking it.
 
@@ -124,7 +124,7 @@ Read the first file found with `read_file`. If neither exists, use the auto-dete
 # fable-config.yaml
 routing:
   research:
-    primary: {model: "deepseek-v4-flash", provider: "opencode-go"}
+    primary: {model: "deepseek-v0.4.0-flash", provider: "opencode-go"}
     secondary: {model: "gemini-2.5-flash-lite", provider: "google"}
     tertiary: {model: "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free", provider: "openrouter"}
   # ... etc for all stages
@@ -136,17 +136,17 @@ Auto-detect available providers from the user's Hermes config (`~/.hermes/config
 
 | Stage | Primary | Secondary | Tertiary | Rationale |
 |-------|---------|-----------|----------|-----------|
-| Research | `deepseek-v4-flash` (Opencode Go) | `gemini-2.5-flash-lite` (Google) | `nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free` (OpenRouter) | Fast, broad, cheap |
-| Plan | `glm-5.1` (Opencode Go) | `gemini-2.5-pro` (Google) | `deepseek-v4-pro` (Opencode Go) | Structured reasoning |
+| Research | `deepseek-v0.4.0-flash` (Opencode Go) | `gemini-2.5-flash-lite` (Google) | `nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free` (OpenRouter) | Fast, broad, cheap |
+| Plan | `glm-5.1` (Opencode Go) | `gemini-2.5-pro` (Google) | `deepseek-v0.4.0-pro` (Opencode Go) | Structured reasoning |
 | Implement | `kimi-k2.7-code` (Opencode Go) | `kimi-k2.6` (Opencode Go) | `gemini-2.5-pro` (Google) | Code-specialized |
-| Verify | `deepseek-v4-pro` (Opencode Go) | `gemini-2.5-pro` (Google) | `kimi-k2.6` (Opencode Go) | Different architecture from coder |
+| Verify | `deepseek-v0.4.0-pro` (Opencode Go) | `gemini-2.5-pro` (Google) | `kimi-k2.6` (Opencode Go) | Different architecture from coder |
 | Critique | `glm-5.1` (Opencode Go) | `gemini-2.5-pro` (Google) | `kimi-k2.6` (Opencode Go) | Independent evaluation |
-| Consolidate | `deepseek-v4-pro` (Opencode Go) | `glm-5.1` (Opencode Go) | `gemini-2.5-pro` (Google) | Reads all stages, produces canonical output |
+| Consolidate | `deepseek-v0.4.0-pro` (Opencode Go) | `glm-5.1` (Opencode Go) | `gemini-2.5-pro` (Google) | Reads all stages, produces canonical output |
 
 ### Provider Setup
 
 **NVIDIA NIM provider** requires all of the following:
-1. `providers.nvidia.base_url: https://integrate.api.nvidia.com/v1` in `~/.hermes/config.yaml`
+1. `providers.nvidia.base_url: https://integrate.api.nvidia.com/v0.1.0` in `~/.hermes/config.yaml`
 2. `providers.nvidia.api_key: ${NVIDIA_API_KEY}` in `~/.hermes/config.yaml`
 3. `NVIDIA_API_KEY=...` in `~/.hermes/.env`
 4. **Gateway restart** after any env var changes: `hermes gateway restart` (from a separate shell)
@@ -174,9 +174,9 @@ When the user prioritises speed and cost, you MAY reduce routing cost. Two sub-m
 
 ### Sub-mode 2: Single-Model Flatlining (one model for ALL stages)
 
-**Trigger words:** "all on one model", "single cheapest model", "flatline everything", "use only deepseek-v4-flash", "one model for everything" — explicit single-model language.
+**Trigger words:** "all on one model", "single cheapest model", "flatline everything", "use only deepseek-v0.4.0-flash", "one model for everything" — explicit single-model language.
 
-**What it means:** Override the entire routing table. Every stage runs on the same cheap model (e.g. `deepseek-v4-flash`). Cross-family verification is lost — Verify, Critique, and Implement all share the same model family.
+**What it means:** Override the entire routing table. Every stage runs on the same cheap model (e.g. `deepseek-v0.4.0-flash`). Cross-family verification is lost — Verify, Critique, and Implement all share the same model family.
 
 ### What is preserved (both modes):
 
@@ -193,7 +193,7 @@ When the user prioritises speed and cost, you MAY reduce routing cost. Two sub-m
 | "cheapest models in the routing table" | Primary-only | flash → glm → kimi → pro → glm → pro |
 | "token-budget test" (no "single model") | Primary-only | Same as above |
 | "use the cheapest model for everything" | Single-model | flash → flash → flash → flash → flash → flash |
-| "all on deepseek-v4-flash" | Single-model | flash → flash → flash → flash → flash → flash |
+| "all on deepseek-v0.4.0-flash" | Single-model | flash → flash → flash → flash → flash → flash |
 | "run this through Fable" (no cost directive) | Full routing | Normal table with fallback chains |
 | (no explicit trigger) | Full routing | Normal table with fallback chains |
 
@@ -222,7 +222,7 @@ Stage 6: Consolidate →  read all stages, apply fixes, produce FINAL.md
 
 ---
 
-## Deliverable Type Classification (v8.0)
+## Deliverable Type Classification (v0.8.0)
 
 The Plan stage MUST classify the deliverable into one of five canonical types. This classification calibrates downstream effort — the Implement stage writes differently for a research brief than for an execution playbook, and the Consolidate stage applies critique fixes differently for a credential asset than for a creative brief.
 
@@ -443,7 +443,7 @@ You MUST maintain a `WORK_LOG.md` in the project directory. This is the handoff 
 ## Model Usage Log
 | Stage | Intended | Actual | Verified |
 |-------|----------|--------|----------|
-| Research | deepseek-v4-flash | [actual] | [yes/no] |
+| Research | deepseek-v0.4.0-flash | [actual] | [yes/no] |
 ...
 ```
 
@@ -602,7 +602,7 @@ hermes skills install https://raw.githubusercontent.com/iamnickthegeek/fableous/
 
 No `pip install`. No daemon setup. No SQLite configuration. Just load the skill and follow the procedure. Optional helper scripts in `scripts/` can be run directly with Python.
 
-For the historical v1-v5 engine code, see `archive/`.
+For the historical v0.1.0-v0.5.0 engine code, see `archive/`.
 
 ## Reference Files
 
@@ -620,13 +620,13 @@ For the historical v1-v5 engine code, see `archive/`.
 - `references/delegate-task-model-fallback.md` — decision tree
 - `references/helper-scripts.md` — how and when to use the `scripts/` utilities
 - `references/native-first-gap-fillers.md` — audit of what Fable adds vs what Hermes provides
-- `references/v6-1-trigger-checklist.md` — when to invoke Fable and when to skip it
+- `references/v0.6.0-1-trigger-checklist.md` — when to invoke Fable and when to skip it
 - `references/token-budget-mode.md` — single-model lightweight execution mode
 - `references/pricing-verification-volatility.md` — SaaS pricing decays fast
 - `references/ronin-partner-finder-case-study.md` — worked example
 - `references/skill-rename-procedure.md` — clean rename procedure
 - `references/test-notes.md` — known issues and test matrix
-- `references/cross-run-quality-analysis.md` — v8.0 case study
+- `references/cross-run-quality-analysis.md` — v0.8.0 case study
 - `references/pitfall-19-nvidia-rate-limits.md` — NVIDIA free-tier rate limit workaround
 - `templates/stage-prompts/` — prompt templates for each standard stage
 - `templates/fable-config-nvidia-nim.yaml` — ready-to-use config for NVIDIA NIM
