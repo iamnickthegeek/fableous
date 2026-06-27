@@ -1,6 +1,6 @@
-# v6.1 Trigger Checklist
+# v0.6.1 Trigger Checklist
 
-Fable v6.1 formalises when to invoke the orchestrator. The skill itself is
+Fable v0.6.1 formalises when to invoke the orchestrator. The skill itself is
 powerful but not free. Use this checklist before starting a Fable run.
 
 ## Trigger if YES to any of these
@@ -34,6 +34,6 @@ task is lower than the cost of skipping Fable on a task that needed it.
 
 ## Why this was formalised
 
-Prior to v6.1 the trigger was described informally. The checklist removes
+Prior to v0.6.1 the trigger was described informally. The checklist removes
 ambiguity for the agent and prevents both under-use (skipping Fable on hard
 work) and over-use (running Fable on trivial one-shot tasks).
