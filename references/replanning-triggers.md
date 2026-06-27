@@ -1,6 +1,6 @@
-# Replanning Triggers — v6
+# Replanning Triggers — v0.6.0
 
-Dynamic replanning is a core feature of the Fable Orchestrator v6. The orchestrator MUST check for replanning triggers after every stage completion. If a trigger fires, the orchestrator MUST rebuild the plan.
+Dynamic replanning is a core feature of the Fable Orchestrator v0.6.0. The orchestrator MUST check for replanning triggers after every stage completion. If a trigger fires, the orchestrator MUST rebuild the plan.
 
 ## Trigger Conditions
 
