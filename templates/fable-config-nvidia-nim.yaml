@@ -1,0 +1,73 @@
+# Fable Orchestrator — NVIDIA NIM routing config (complete example)
+#
+# A ready-to-use fable-config.yaml for the NVIDIA NIM provider, where a single
+# NVIDIA_API_KEY unlocks every model family (DeepSeek, GLM, Kimi, Qwen,
+# Nemotron). Copy this to ~/.hermes/skills/fableous/fable-config.yaml (or your
+# project directory) and adjust the models to taste.
+#
+# Cross-family rule (enforced by the skill): verify, critique, and consolidate
+# must each run on a DIFFERENT model family than implement. Implement uses the
+# Nemotron family below, so verify / critique / consolidate deliberately avoid
+# Nemotron at every fallback level.
+
+routing:
+  research:
+    primary:
+      model: deepseek-ai/deepseek-v0.4.0-flash
+      provider: nvidia
+    secondary:
+      model: qwen/qwen3.5-397b-a17b
+      provider: nvidia
+    tertiary:
+      model: z-ai/glm-5.1
+      provider: nvidia
+  plan:
+    primary:
+      model: z-ai/glm-5.1
+      provider: nvidia
+    secondary:
+      model: qwen/qwen3.5-397b-a17b
+      provider: nvidia
+    tertiary:
+      model: deepseek-ai/deepseek-v0.4.0-pro
+      provider: nvidia
+  implement:
+    primary:
+      model: nvidia/nemotron-3-ultra-550b-a55b
+      provider: nvidia
+    secondary:
+      model: moonshotai/kimi-k2.7-code
+      provider: nvidia
+    tertiary:
+      model: deepseek-ai/deepseek-v0.4.0-pro
+      provider: nvidia
+  verify:
+    primary:
+      model: moonshotai/kimi-k2.6
+      provider: nvidia
+    secondary:
+      model: deepseek-ai/deepseek-v0.4.0-pro
+      provider: nvidia
+    tertiary:
+      model: z-ai/glm-5.1
+      provider: nvidia
+  critique:
+    primary:
+      model: qwen/qwen3.5-397b-a17b
+      provider: nvidia
+    secondary:
+      model: z-ai/glm-5.1
+      provider: nvidia
+    tertiary:
+      model: moonshotai/kimi-k2.6
+      provider: nvidia
+  consolidate:
+    primary:
+      model: deepseek-ai/deepseek-v0.4.0-pro
+      provider: nvidia
+    secondary:
+      model: moonshotai/kimi-k2.6
+      provider: nvidia
+    tertiary:
+      model: z-ai/glm-5.1
+      provider: nvidia

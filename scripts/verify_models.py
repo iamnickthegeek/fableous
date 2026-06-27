@@ -92,7 +92,7 @@ def main() -> int:
     )
     parser.add_argument(
         "--config",
-        help="Path to fable-config.yaml (uses defaults if omitted)",
+        help="Path to fable-config.yaml (auto-discovered from ~/.hermes/skills/fableous/ or ./ if omitted; errors if none found)",
     )
     parser.add_argument(
         "--live-test",
@@ -102,8 +102,12 @@ def main() -> int:
     args = parser.parse_args()
 
     hermes_env = load_dotenv()
-    routing = load_routing(args.config)
-    entries = flatten_entries(routing)
+    try:
+        routing = load_routing(args.config)
+        entries = flatten_entries(routing)
+    except Exception as e:
+        print(f"Error: {e}", file=sys.stderr)
+        return 1
 
     print("# Fable Orchestrator v0.6.0 \u2014 Model Pre-flight Check\n")
 

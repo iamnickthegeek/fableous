@@ -24,11 +24,9 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from fable_routing import (
-    flatten_entries,
     load_dotenv,
     load_routing,
     provider_env_set,
-    routing_entry_to_config_commands,
 )
 
 try:
@@ -122,12 +120,28 @@ def _read_backup() -> dict:
         return {}
 
 
-def _write_backup(original_model: str, original_provider: str, current_stage: str | None = None) -> None:
-    """Write the backup file with original config values."""
+def _write_backup(
+    original_model: str,
+    original_provider: str,
+    current_stage: str | None = None,
+    original_api_key: str = "",
+    original_base_url: str = "",
+    original_api_mode: str = "",
+) -> None:
+    """Write the backup file with the original delegation config values.
+
+    All five delegation fields are captured so `restore` can return the
+    config to exactly its pre-Fable state. cmd_set clears api_key/base_url/
+    api_mode per stage, so they must be backed up here or their original
+    values are lost permanently.
+    """
     _ensure_backup_dir()
     backup = {
         "original_model": original_model,
         "original_provider": original_provider,
+        "original_api_key": original_api_key,
+        "original_base_url": original_base_url,
+        "original_api_mode": original_api_mode,
         "current_stage": current_stage,
         "timestamp": datetime.now(timezone.utc).isoformat(),
     }
@@ -181,7 +195,17 @@ def cmd_set(args: argparse.Namespace) -> dict:
     if "original_model" not in backup:
         orig_model = _hermes_config_get("delegation.model")
         orig_provider = _hermes_config_get("delegation.provider")
-        _write_backup(orig_model, orig_provider, args.stage)
+        orig_api_key = _hermes_config_get("delegation.api_key")
+        orig_base_url = _hermes_config_get("delegation.base_url")
+        orig_api_mode = _hermes_config_get("delegation.api_mode")
+        _write_backup(
+            orig_model,
+            orig_provider,
+            args.stage,
+            orig_api_key,
+            orig_base_url,
+            orig_api_mode,
+        )
     else:
         # Update the current stage in backup
         backup["current_stage"] = args.stage
@@ -213,19 +237,28 @@ def cmd_restore(args: argparse.Namespace) -> dict:
     Falls back to current config values if backup is missing.
     """
     backup = _read_backup()
-    original_model = backup.get("original_model", "")
-    original_provider = backup.get("original_provider", "")
 
-    if not original_model and not original_provider:
-        # No backup — read current values and treat them as originals
+    if "original_model" in backup:
+        # Restore the exact pre-Fable delegation config from the backup.
+        original_model = backup.get("original_model", "")
+        original_provider = backup.get("original_provider", "")
+        original_api_key = backup.get("original_api_key", "")
+        original_base_url = backup.get("original_base_url", "")
+        original_api_mode = backup.get("original_api_mode", "")
+    else:
+        # No backup — read current values and treat them as originals so
+        # restore is a safe no-op instead of wiping live config.
         original_model = _hermes_config_get("delegation.model")
         original_provider = _hermes_config_get("delegation.provider")
+        original_api_key = _hermes_config_get("delegation.api_key")
+        original_base_url = _hermes_config_get("delegation.base_url")
+        original_api_mode = _hermes_config_get("delegation.api_mode")
 
     _hermes_config_set("delegation.model", original_model)
     _hermes_config_set("delegation.provider", original_provider)
-    _hermes_config_set("delegation.api_key", "")
-    _hermes_config_set("delegation.base_url", "")
-    _hermes_config_set("delegation.api_mode", "")
+    _hermes_config_set("delegation.api_key", original_api_key)
+    _hermes_config_set("delegation.base_url", original_base_url)
+    _hermes_config_set("delegation.api_mode", original_api_mode)
 
     # Remove backup after successful restore
     if BACKUP_FILE.exists():
@@ -265,7 +298,8 @@ def cmd_verify(args: argparse.Namespace) -> dict:
     """Execute the 'verify' command.
 
     Reads the first line of the output file and checks for a model tag.
-    Returns exit code 0 on match, 1 on mismatch, 2 on missing tag.
+    Returns exit code 0 on match, 1 on mismatch, 2 on missing tag,
+    3 on error (e.g. output file not found).
     """
     output_path = Path(args.output)
     if not output_path.exists():
@@ -282,7 +316,7 @@ def cmd_verify(args: argparse.Namespace) -> dict:
 
     # Match [MODEL: name, PROVIDER: provider]
     pattern = re.compile(
-        r"\[MODEL:\s*(?P<model>\S+),\s*PROVIDER:\s*(?P<provider>\S+)\]"
+        r"\[MODEL:\s*(?P<model>\S+)\s*,\s*PROVIDER:\s*(?P<provider>\S+)\s*\]"
     )
     match = pattern.search(first_line)
 
@@ -369,6 +403,8 @@ def main() -> int:
             return 0
         elif status == "mismatch":
             return 1
+        elif status == "error":
+            return 3
         else:
             return 2
 

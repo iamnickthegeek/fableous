@@ -20,8 +20,6 @@ import sys
 from pathlib import Path
 
 from fable_routing import (
-    DEFAULT_ROUTING,
-    flatten_entries,
     load_dotenv,
     load_routing,
     provider_env_set,
@@ -112,7 +110,7 @@ def via_config_mode(stage: str, config_path: str | None, model: str | None = Non
         if result.returncode != 0:
             print(result.stdout, file=sys.stderr)
             print(result.stderr, file=sys.stderr)
-            print("Config cycling set failed. Falling back to terminal mode.", file=sys.stderr)
+            print("Config cycling set failed.", file=sys.stderr)
             return 1
         routing_info = json.loads(result.stdout)
     except Exception as e:
@@ -124,7 +122,7 @@ def via_config_mode(stage: str, config_path: str | None, model: str | None = Non
     print(f"# Stage: {stage}")
     print(f"# Model: {routing_info.get('model', 'unknown')}")
     print(f"# Provider: {routing_info.get('provider', 'unknown')}")
-    print(f"# Level: {routing_info.get('level', routing_info.get('level', 'explicit'))}")
+    print(f"# Level: {routing_info.get('level', 'explicit')}")
     print()
     print(f"Config has been set for {stage}. Call delegate_task now.")
     print()
@@ -158,7 +156,7 @@ def main() -> int:
     group.add_argument("--prompt-file", help="Path to a file containing the prompt")
     parser.add_argument(
         "--config",
-        help="Path to fable-config.yaml (uses defaults if omitted)",
+        help="Path to fable-config.yaml (auto-discovered from ~/.hermes/skills/fableous/ or ./ if omitted; errors if none found)",
     )
     parser.add_argument(
         "--model",
@@ -183,17 +181,15 @@ def main() -> int:
     # Via-config mode: set config and print delegate_task instructions
     if args.via_config:
         result = via_config_mode(args.stage, args.config, args.model, args.provider)
+        print("# Prompt (intended for delegate_task):")
+        print()
         if args.prompt_file:
             prompt_path = Path(args.prompt_file)
             if prompt_path.exists():
-                prompt = prompt_path.read_text()
+                print(prompt_path.read_text())
             else:
-                print(f"# Prompt (intended for delegate_task):")
-                print()
                 print("No prompt file found.")
         else:
-            print(f"# Prompt (intended for delegate_task):")
-            print()
             print(args.prompt)
         return result
 
@@ -206,7 +202,11 @@ def main() -> int:
     else:
         prompt = args.prompt
 
-    routing = load_routing(args.config)
+    try:
+        routing = load_routing(args.config)
+    except Exception as e:
+        print(f"Error: {e}", file=sys.stderr)
+        return 1
     stage_routing = routing.get(args.stage, {})
 
     # Build ordered list of attempts.
