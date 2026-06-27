@@ -28,8 +28,8 @@ Both Verify stages checked the same claim against live sources. Both correctly c
 
 | Verify Stage | Reported "Current" Price | Source Window |
 |-------------|--------------------------|---------------|
-| Test 7-1 (deepseek-v4-flash) | ~$39/mo Lite | Caught the mid-cycle price bump |
-| Test 7-2 (deepseek-v4-pro) | $79/mo Starter | Caught the April 2026 full restructure |
+| Test 7-1 (deepseek-v0.4.0-flash) | ~$39/mo Lite | Caught the mid-cycle price bump |
+| Test 7-2 (deepseek-v0.4.0-pro) | $79/mo Starter | Caught the April 2026 full restructure |
 
 Both were "correct" for their search window — the $39/mo figure was still indexed in some sources, while the $79/mo reflected the post-restructure reality. This is NOT a failure of either verification stage. It's the nature of pricing data decay.
 
@@ -54,7 +54,7 @@ Based on this pattern, the Verify stage should apply these techniques for ANY pr
 
 The pipeline caught the wrong pricing in BOTH tests despite using different models and different execution modes:
 
-- Test 7-1: Single cheap model (deepseek-v4-flash), still caught the error
+- Test 7-1: Single cheap model (deepseek-v0.4.0-flash), still caught the error
 - Test 7-2: Multi-model routing, caught a deeper restructure
 
 The structure (separate Research → Verify → Critique → Consolidate stages) is what catches errors, not model quality. Even with a weak model, a separate Verify stage asking "are these claims actually true RIGHT NOW?" catches things a single-pass draft never would.
