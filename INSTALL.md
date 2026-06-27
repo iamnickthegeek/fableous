@@ -1,7 +1,7 @@
-# Fable Orchestrator v6 — Installation Guide
+# Fable Orchestrator v0.6.0 — Installation Guide
 
 This guide is written for non-technical users. You do not need to write code or
-run a server. Fable v6 is a **Hermes skill** — a set of instructions and small
+run a server. Fable v0.6.0 is a **Hermes skill** — a set of instructions and small
 helper scripts that Hermes can follow.
 
 ## What you need before you start
@@ -54,10 +54,10 @@ You should see a table like this:
 ```
 Stage        Level      Model                          Provider       Key      Status
 -----------------------------------------------------------------------------------------------
-research     primary    deepseek-v4-flash              opencode-go    OK       OK
+research     primary    deepseek-v0.4.0-flash              opencode-go    OK       OK
 plan         primary    glm-5.1                        opencode-go    OK       OK
 ...
-All checks passed. You can run Fable Orchestrator v6.
+All checks passed. You can run Fable Orchestrator v0.6.0.
 ```
 
 If any row says `FAIL`, that provider's API key is missing. Add it to
@@ -112,11 +112,11 @@ Hermes will load the skill and follow the 6-stage procedure.
   python3 scripts/run_stage.py --stage research --prompt "..." --timeout 600
   ```
 - **Wrong model was used**: Check the first line of the output file. It should
-  contain a tag like `[MODEL: deepseek-v4-flash, PROVIDER: opencode-go]`.
+  contain a tag like `[MODEL: deepseek-v0.4.0-flash, PROVIDER: opencode-go]`.
 
 ## Files you can ignore
 
-- `archive/` contains old v1-v5 code and planning documents. You do not need to
+- `archive/` contains old v0.1.0-v0.5.0 code and planning documents. You do not need to
   touch it.
 - `__pycache__/` and `.pytest_cache/` are auto-generated Python caches.
 
