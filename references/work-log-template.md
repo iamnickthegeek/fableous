@@ -1,4 +1,4 @@
-# Work Log Template — v6
+# Work Log Template — v0.6.0
 
 Structured handoff protocol for multi-session Fable execution. The work log is the ONLY continuity mechanism between sessions. Hermes session_search may not retain the full context. The work log MUST survive session resets.
 
@@ -50,12 +50,12 @@ Structured handoff protocol for multi-session Fable execution. The work log is t
 
 | Stage | Intended | Actual | Verified | Retry Chain |
 |-------|----------|--------|----------|-------------|
-| Research | deepseek-v4-flash | [actual] | [yes/no] | [none / secondary / tertiary] |
+| Research | deepseek-v0.4.0-flash | [actual] | [yes/no] | [none / secondary / tertiary] |
 | Plan | glm-5.1 | [actual] | [yes/no] | [none / secondary / tertiary] |
 | Implement | kimi-k2.7-code | [actual] | [yes/no] | [none / secondary / tertiary] |
-| Verify | deepseek-v4-pro | [actual] | [yes/no] | [none / secondary / tertiary] |
+| Verify | deepseek-v0.4.0-pro | [actual] | [yes/no] | [none / secondary / tertiary] |
 | Critique | glm-5.1 | [actual] | [yes/no] | [none / secondary / tertiary] |
-| Consolidate | deepseek-v4-pro | [actual] | [yes/no] | [none / secondary / tertiary] |
+| Consolidate | deepseek-v0.4.0-pro | [actual] | [yes/no] | [none / secondary / tertiary] |
 
 ---
 
@@ -69,7 +69,7 @@ Structured handoff protocol for multi-session Fable execution. The work log is t
 
 | Delegation ID | Stage | Dispatched | Completed | Model | Status |
 |---------------|-------|------------|-----------|-------|--------|
-| async-abc123 | Research | 14:30:00 | 14:35:19 | deepseek-v4-flash | ✅ |
+| async-abc123 | Research | 14:30:00 | 14:35:19 | deepseek-v0.4.0-flash | ✅ |
 | async-yyy456 | Plan | 14:30:05 | 14:30:34 | glm-5.1 | ✅ |
 
 ---
@@ -89,7 +89,7 @@ Structured handoff protocol for multi-session Fable execution. The work log is t
 ## Session 3 — 2026-06-14
 
 ### Completed
-- [x] Stage 1: Research — deepseek-v4-flash (opencode-go) — verified: yes
+- [x] Stage 1: Research — deepseek-v0.4.0-flash (opencode-go) — verified: yes
 - [x] Stage 2: Plan — glm-5.1 (opencode-go) — verified: yes
 - [x] Stage 3: Implement — kimi-k2.7-code (opencode-go) — verified: yes
 - [ ] Stage 4: Verify — pending
