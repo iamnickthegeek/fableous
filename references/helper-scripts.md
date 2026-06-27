@@ -1,6 +1,6 @@
 # Helper Scripts
 
-Fable v6 ships with a few small Python utilities in `scripts/`. They are
+Fable v0.6.0 ships with a few small Python utilities in `scripts/`. They are
 convenience tools, not an engine. The skill works perfectly without them.
 
 ## Scripts
