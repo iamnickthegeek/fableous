@@ -1,4 +1,4 @@
-# Config Cycling — v7
+# Config Cycling — v0.7.0
 
 ## How it works
 
@@ -13,7 +13,7 @@
 Every config cycle is exactly these 5 commands, with the model and provider changing per stage:
 
 ```bash
-hermes config set delegation.model "deepseek-v4-flash"
+hermes config set delegation.model "deepseek-v0.4.0-flash"
 hermes config set delegation.provider "opencode-go"
 hermes config set delegation.api_key ""
 hermes config set delegation.base_url ""
@@ -31,7 +31,7 @@ Use `scripts/route_config.py` to automate config cycling:
 python3 scripts/route_config.py set --stage research
 
 # Set config with explicit model/provider
-python3 scripts/route_config.py set --model deepseek-v4-flash --provider opencode-go
+python3 scripts/route_config.py set --model deepseek-v0.4.0-flash --provider opencode-go
 
 # Restore original config
 python3 scripts/route_config.py restore
@@ -40,7 +40,7 @@ python3 scripts/route_config.py restore
 python3 scripts/route_config.py status
 
 # Verify model tag in stage output
-python3 scripts/route_config.py verify --output stage1_research.md --expected-model deepseek-v4-flash
+python3 scripts/route_config.py verify --output stage1_research.md --expected-model deepseek-v0.4.0-flash
 ```
 
 ## Complete Agent Procedure for One Stage
@@ -48,7 +48,7 @@ python3 scripts/route_config.py verify --output stage1_research.md --expected-mo
 ```
 1. terminal("python3 ~/.hermes/skills/fableous/scripts/route_config.py set --stage research")
 2. delegate_task(goal="Stage 1: Research — ...", context="...", toolsets=["web", "file"])
-3. terminal("python3 ~/.hermes/skills/fableous/scripts/route_config.py verify --output stage1_research.md --expected-model deepseek-v4-flash")
+3. terminal("python3 ~/.hermes/skills/fableous/scripts/route_config.py verify --output stage1_research.md --expected-model deepseek-v0.4.0-flash")
 4. (proceed to next stage — step 1 with --stage plan)
 ```
 
@@ -60,7 +60,7 @@ Config cycling is not safe for concurrent `delegate_task` calls targeting differ
 
 ## Async Safety
 
-Starting in v7.1, Research and Plan can be dispatched in parallel using `delegate_task(background=true)`. Config cycling between dispatches is safe because:
+Starting in v0.7.1, Research and Plan can be dispatched in parallel using `delegate_task(background=true)`. Config cycling between dispatches is safe because:
 
 The child agent is constructed synchronously inside `delegate_task()` — BEFORE the background worker is dispatched to the daemon thread pool. The model, provider, base_url, api_key, and api_mode are all passed to `_build_child_agent()` at construction time and snapshotted in the child agent object. The background worker does NOT re-read config.
 
@@ -126,7 +126,7 @@ File: `~/.hermes/skills/fableous/.routing-backup.json`
 
 ```json
 {
-  "original_model": "deepseek-v4-pro",
+  "original_model": "deepseek-v0.4.0-pro",
   "original_provider": "opencode-go",
   "current_stage": null,
   "timestamp": "2026-07-11T14:30:00Z"
